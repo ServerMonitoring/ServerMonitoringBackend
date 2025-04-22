@@ -11,7 +11,7 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 @ToString
-public class MetricDTO {
+public class MetricDTORequest {
     private Instant timestamp;
     private Long uptime;
     private Double netSent;
@@ -22,13 +22,13 @@ public class MetricDTO {
     private Integer activeConnections;
     private Double diskTotalUsedPercent;
     private Double diskTotalAvailable;
-    private MemoryDTO memory;
-    private SwapDTO swap;
-    private CPUDTO cpu;
-    private NetworkConnectionDTO networkConnection;
-    private List<DiskDTO> disks;
-    private List<DiskIODTO> diskIo;
-    private List<GPUDTO> gpu;
-    private List<NetInterfaceDTO> netInterfaces;
+    private MemoryDTORequest memory;
+    private SwapDTORequest swap;
+    private CPUDTORequest cpu;
+    private NetworkConnectionDTORequest networkConnection;
+    private List<DiskDTORequest> disks;
+    private List<DiskIODTORequest> diskIo;
+    private List<GPUDTORequest> gpu;
+    private List<NetInterfaceDTORequest> netInterfaces;
 
 }
