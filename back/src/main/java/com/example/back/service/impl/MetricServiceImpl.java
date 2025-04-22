@@ -44,6 +44,17 @@ public class MetricServiceImpl implements MetricService {
         metric.setDiskTotalAvailable(metricDTORequest.getDiskTotalAvailable());
         metric.setServer(server);
 
+
+        //TODO можно сделать хелпер метод внутри metrics двухсторонней связи ( и для remove ??? )
+     /*   public void addDisk(Disk disk) {
+            if (disks == null) disks = new ArrayList<>();
+            disks.add(disk);
+            disk.setMetric(this);
+        }
+
+        for (DiskDTORequest dto : metricDTORequest.getDisks()) {
+            metric.addDisk(DiskDTORequest.toModel(dto));
+        }*/
         // Устанавливаем дочерние объекты в родителя
         Memory memory = MemoryDTORequest.toModel(metricDTORequest.getMemory());
         memory.setMetric(metric);
