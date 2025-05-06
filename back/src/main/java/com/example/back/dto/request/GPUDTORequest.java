@@ -1,6 +1,7 @@
 package com.example.back.dto.request;
 
 import com.example.back.model.GPU;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
 @Getter
@@ -10,10 +11,15 @@ import lombok.*;
 @Builder
 @ToString
 public class GPUDTORequest {
+    @JsonProperty("name")
     private String gpuName;
+    @JsonProperty("load_percent")
     private Double loadPercent;
+    @JsonProperty("memory_total")
     private Double memoryTotal;
+    @JsonProperty("memory_used")
     private Double memoryUsed;
+    @JsonProperty("memory_free")
     private Double memoryFree;
     private Double temperature;
 

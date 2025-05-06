@@ -1,6 +1,7 @@
 package com.example.back.dto.request;
 
 import com.example.back.model.DiskIO;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
 @Getter
@@ -10,20 +11,21 @@ import lombok.*;
 @Builder
 @ToString
 public class DiskIODTORequest {
-    private String driveName;
+    @JsonProperty("read_count")
     private Long readCount;
+    @JsonProperty("write_count")
     private Long writeCount;
+    @JsonProperty()
     private Double read;
     private Double write;
 
-    public static DiskIO toModel(DiskIODTORequest diskIODTORequest){
+    public static DiskIO toModel(String driveName, DiskIODTORequest dto) {
         DiskIO diskIO = new DiskIO();
-        diskIO.setDriveName(diskIODTORequest.getDriveName());
-        diskIO.setReadCount(diskIODTORequest.getReadCount());
-        diskIO.setWriteCount(diskIODTORequest.getWriteCount());
-        diskIO.setRead(diskIODTORequest.getRead());
-        diskIO.setWrite(diskIODTORequest.getWrite());
+        diskIO.setDriveName(driveName);
+        diskIO.setReadCount(dto.getReadCount());
+        diskIO.setWriteCount(dto.getWriteCount());
+        diskIO.setRead(dto.getRead());
+        diskIO.setWrite(dto.getWrite());
         return diskIO;
     }
-
 }

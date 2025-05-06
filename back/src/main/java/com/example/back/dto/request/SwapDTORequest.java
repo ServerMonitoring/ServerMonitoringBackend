@@ -1,6 +1,7 @@
 package com.example.back.dto.request;
 
 import com.example.back.model.Swap;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
 @Getter
@@ -10,9 +11,13 @@ import lombok.*;
 @Builder
 @ToString
 public class SwapDTORequest {
+    @JsonProperty("total")
     private Long swapTotal;
+    @JsonProperty("used")
     private Long swapUsed;
+    @JsonProperty("free")
     private Long swapFree;
+    @JsonProperty("percent")
     private Double swapPercentUsed;
 
 
