@@ -1,6 +1,7 @@
 package com.example.back.dto.request;
 
 import com.example.back.model.Memory;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
 @Getter
@@ -10,10 +11,15 @@ import lombok.*;
 @Builder
 @ToString
 public class MemoryDTORequest {
+    @JsonProperty("total")
     private Long memoryTotal;
+    @JsonProperty("used")
     private Long memoryUsed;
+    @JsonProperty("free")
     private Long memoryFree;
+    @JsonProperty("cached")
     private Long memoryCached;
+    @JsonProperty("percent")
     private Double memoryUsedPercent;
 
     public static Memory toModel(MemoryDTORequest memoryDTO) {

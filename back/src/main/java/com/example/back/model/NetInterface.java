@@ -19,6 +19,8 @@ public class NetInterface {
     private String interfaceName;
     private Double sent;
     private Double recv;
+    private Double packetsSent;
+    private Double packetsRecv;
     private Integer err_in;
     private Integer err_out;
     private Integer drop_in;

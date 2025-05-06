@@ -28,6 +28,7 @@ public class MetricServiceImpl implements MetricService {
     @Override
     @Transactional
     public void saveMetrics(Long serverId, MetricDTORequest metricDTORequest) {
+
         Server server = serverRepository.findById(serverId)
                 .orElseThrow(() -> new RuntimeException("Server not found"));
 
@@ -80,12 +81,13 @@ public class MetricServiceImpl implements MetricService {
                 }).collect(Collectors.toList());
         metric.setDisks(disks);
 
-        List<DiskIO> diskIOs = metricDTORequest.getDiskIo().stream()
-                .map(dto -> {
-                    DiskIO diskIO = DiskIODTORequest.toModel(dto);
+        List<DiskIO> diskIOs = metricDTORequest.getDiskIo().entrySet().stream()
+                .map(entry -> {
+                    DiskIO diskIO = DiskIODTORequest.toModel(entry.getKey(), entry.getValue());
                     diskIO.setMetric(metric);
                     return diskIO;
-                }).collect(Collectors.toList());
+                })
+                .collect(Collectors.toList());
         metric.setDiskIo(diskIOs);
 
         List<GPU> gpus = metricDTORequest.getGpu().stream()

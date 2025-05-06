@@ -23,6 +23,12 @@ public class Server {
     private String ipAddress;
     private String addInfo;
     private boolean online;
+    private String cpuModel;
+    private Integer cpuCountCores;
+    private Integer cpuCountCoresPhysical;
+    private Double minFreq;
+    private Double maxFreq;
+
 
     @OneToMany(mappedBy = "server", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Metric> metrics;

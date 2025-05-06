@@ -16,6 +16,7 @@ public class Disk {
     @JoinColumn(name = "metricId")
     private Metric metric;
 
+    private String device;
     private String mountpoint;
     private Long diskTotal;
     private Long diskUsed;
