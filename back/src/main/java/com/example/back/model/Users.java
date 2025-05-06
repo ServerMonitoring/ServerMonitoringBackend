@@ -9,10 +9,8 @@ import java.util.List;
 @Entity
 @Getter
 @Setter
-@RequiredArgsConstructor
-@NoArgsConstructor
-@AllArgsConstructor
-public class User {
+
+public class Users {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userId;
@@ -30,6 +28,6 @@ public class User {
 
     private String addInfo;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "users", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Server> servers;
 }

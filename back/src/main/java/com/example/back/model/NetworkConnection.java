@@ -7,9 +7,7 @@ import lombok.*;
 @Entity
 @Getter
 @Setter
-@RequiredArgsConstructor
-@NoArgsConstructor
-@AllArgsConstructor
+
 public class NetworkConnection {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

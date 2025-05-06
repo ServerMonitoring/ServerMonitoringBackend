@@ -8,9 +8,7 @@ import java.time.Instant;
 @Entity
 @Getter
 @Setter
-@RequiredArgsConstructor
-@NoArgsConstructor
-@AllArgsConstructor
+
 public class Log {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

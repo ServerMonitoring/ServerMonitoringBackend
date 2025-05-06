@@ -8,9 +8,7 @@ import java.util.List;
 @Entity
 @Getter
 @Setter
-@RequiredArgsConstructor
-@NoArgsConstructor
-@AllArgsConstructor
+
 public class CPU {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

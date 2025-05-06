@@ -6,9 +6,7 @@ import lombok.*;
 @Entity
 @Getter
 @Setter
-@RequiredArgsConstructor
-@NoArgsConstructor
-@AllArgsConstructor
+
 public class Memory {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

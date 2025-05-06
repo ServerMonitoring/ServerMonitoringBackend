@@ -8,17 +8,15 @@ import java.util.List;
 @Entity
 @Getter
 @Setter
-@RequiredArgsConstructor
-@NoArgsConstructor
-@AllArgsConstructor
+
 public class Server {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long serverId;
 
     @ManyToOne
-    @JoinColumn(name = "userId")
-    private User user;
+    @JoinColumn(name = "usersId")
+    private Users users;
 
     private String hostname;
     private String osInfo;
