@@ -22,6 +22,7 @@ public class Users {
     private String position;
     private String login;
     private String password;
+    private Boolean isActive;
 
     @Enumerated(EnumType.STRING)
     private Role role;
