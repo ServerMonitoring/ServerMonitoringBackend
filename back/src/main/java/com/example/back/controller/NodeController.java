@@ -1,6 +1,7 @@
 package com.example.back.controller;
 
 import com.example.back.dto.request.MetricDTORequest;
+import com.example.back.dto.request.StaticMetricDTORequest;
 import com.example.back.service.MetricService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,9 +22,15 @@ public class NodeController {
         this.metricService = metricService;
     }
 
-    @PostMapping("/violite")
+    @PostMapping("/changeable")
     public ResponseEntity<String> saveMetric(@RequestBody MetricDTORequest metricDTORequest) {
         metricService.saveMetrics(1L,metricDTORequest);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @PostMapping("/static")
+    public ResponseEntity<String> saveStaticMetric(@RequestBody StaticMetricDTORequest staticMetricDTORequest) {
+        metricService.saveStaticMetrics(1L,staticMetricDTORequest);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 }
