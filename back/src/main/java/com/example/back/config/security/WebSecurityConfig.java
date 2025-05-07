@@ -76,8 +76,8 @@ public class WebSecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/**").permitAll()
 
-                        .requestMatchers("/api/type_of_service/get").hasAnyAuthority( Role.ADMIN.name(), Role.User.name())
-                        .requestMatchers("/api/service_detail/get_all_services").hasAnyAuthority(Role.ADMIN.name(), Role.User.name())
+                        .requestMatchers("/api/type_of_service/get").hasAnyAuthority( Role.ADMIN.name(), Role.USER.name())
+                        .requestMatchers("/api/service_detail/get_all_services").hasAnyAuthority(Role.ADMIN.name(), Role.USER.name())
 
                         .requestMatchers(
                                 "/api/aggregator/**",
