@@ -21,6 +21,10 @@ public class CPUDTORequest {
     private Double cpuTimeSystem;
     @JsonProperty("cpu_time_idle")
     private Double cpuTimeIdle;
+    @JsonProperty("cpu_time_interrupt")
+    private Double cpuTimeInterrupt;
+    @JsonProperty("cpu_time_dpc")
+    private Double cpuTimeDpc;
     @JsonProperty("ctx_switches")
     private Long ctxSwitches;
     private Long interrupts;
@@ -37,6 +41,8 @@ public class CPUDTORequest {
         cpu.setCpuTimeUser(cpuDTORequest.getCpuTimeUser());
         cpu.setCpuTimeSystem(cpuDTORequest.getCpuTimeSystem());
         cpu.setCpuTimeIdle(cpuDTORequest.getCpuTimeIdle());
+        cpu.setCpuTimeInterrupt(cpuDTORequest.getCpuTimeInterrupt());
+        cpu.setCpuTimeDpc(cpuDTORequest.getCpuTimeDpc());
         cpu.setCtxSwitches(cpuDTORequest.getCtxSwitches());
         cpu.setInterrupts(cpuDTORequest.getInterrupts());
         cpu.setSoftInterrupts(cpuDTORequest.getSoftInterrupts());

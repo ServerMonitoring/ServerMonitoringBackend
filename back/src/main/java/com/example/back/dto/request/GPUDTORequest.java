@@ -21,6 +21,8 @@ public class GPUDTORequest {
     private Double memoryUsed;
     @JsonProperty("memory_free")
     private Double memoryFree;
+    @JsonProperty("memory_used_percent")
+    private Double memoryUsedPercent;
     private Double temperature;
 
     public static GPU toModel(GPUDTORequest gpuDTORequest) {
@@ -30,6 +32,7 @@ public class GPUDTORequest {
         gpu.setMemoryTotal(gpuDTORequest.getMemoryTotal());
         gpu.setMemoryUsed(gpuDTORequest.getMemoryUsed());
         gpu.setMemoryFree(gpuDTORequest.getMemoryFree());
+        gpu.setMemoryUsedPercent(gpuDTORequest.getMemoryUsedPercent());
         gpu.setTemperature(gpuDTORequest.getTemperature());
         return gpu;
     }

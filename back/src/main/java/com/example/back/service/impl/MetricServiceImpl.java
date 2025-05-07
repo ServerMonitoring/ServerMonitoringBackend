@@ -5,12 +5,12 @@ import com.example.back.model.*;
 import com.example.back.repository.MetricRepository;
 import com.example.back.repository.ServerRepository;
 import com.example.back.service.*;
+import com.example.back.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class MetricServiceImpl implements MetricService {
@@ -23,6 +23,27 @@ public class MetricServiceImpl implements MetricService {
     public MetricServiceImpl(MetricRepository metricRepository, ServerRepository serverRepository ) {
         this.metricRepository = metricRepository;
         this.serverRepository = serverRepository;
+    }
+
+    @Override
+    @Transactional
+    public void saveStaticMetrics(Long serverId, StaticMetricDTORequest dtoRequest){
+        Server server = serverRepository.findById(serverId)
+                .orElseThrow(() -> new RuntimeException("Server not found"));
+
+        boolean changed = false;
+
+        changed |= EntityUtils.updateIfChanged(server::getHostname, server::setHostname, dtoRequest.getHostname());
+        changed |= EntityUtils.updateIfChanged(server::getOsInfo, server::setOsInfo, dtoRequest.getOs());
+        changed |= EntityUtils.updateIfChanged(server::getCpuModel, server::setCpuModel, dtoRequest.getCpuModel());
+        changed |= EntityUtils.updateIfChanged(server::getCpuCountCores, server::setCpuCountCores, dtoRequest.getCpuCountCores());
+        changed |= EntityUtils.updateIfChanged(server::getCpuCountCoresPhysical, server::setCpuCountCoresPhysical, dtoRequest.getCpuCountCoresPhysical());
+        changed |= EntityUtils.updateIfChanged(server::getMinFreq, server::setMinFreq, dtoRequest.getMinFreq());
+        changed |= EntityUtils.updateIfChanged(server::getMaxFreq, server::setMaxFreq, dtoRequest.getMaxFreq());
+
+        if (changed){
+            serverRepository.save(server);
+        }
     }
 
     @Override
@@ -65,8 +86,18 @@ public class MetricServiceImpl implements MetricService {
         swap.setMetric(metric);
         metric.setSwap(swap);
 
+
+
         CPU cpu = CPUDTORequest.toModel(metricDTORequest.getCpu());
         cpu.setMetric(metric);
+
+        List<Core> cores = metricDTORequest.getCpu().getCores().stream()
+                .map(dto ->{
+                    Core core = CoresDTORequest.toModel(dto);
+                    core.setCpu(cpu);
+                    return core;
+                }).toList();
+        cpu.setCores(cores);
         metric.setCpu(cpu);
 
         NetworkConnection networkConnection = NetworkConnectionDTORequest.toModel(metricDTORequest.getNetworkConnection());
@@ -78,7 +109,7 @@ public class MetricServiceImpl implements MetricService {
                     Disk disk = DiskDTORequest.toModel(dto);
                     disk.setMetric(metric);
                     return disk;
-                }).collect(Collectors.toList());
+                }).toList();
         metric.setDisks(disks);
 
         List<DiskIO> diskIOs = metricDTORequest.getDiskIo().entrySet().stream()
@@ -86,8 +117,7 @@ public class MetricServiceImpl implements MetricService {
                     DiskIO diskIO = DiskIODTORequest.toModel(entry.getKey(), entry.getValue());
                     diskIO.setMetric(metric);
                     return diskIO;
-                })
-                .collect(Collectors.toList());
+                }).toList();
         metric.setDiskIo(diskIOs);
 
         List<GPU> gpus = metricDTORequest.getGpu().stream()
@@ -95,7 +125,7 @@ public class MetricServiceImpl implements MetricService {
                     GPU gpu = GPUDTORequest.toModel(dto);
                     gpu.setMetric(metric);
                     return gpu;
-                }).collect(Collectors.toList());
+                }).toList();
         metric.setGpu(gpus);
 
         List<NetInterface> netInterfaces = metricDTORequest.getNetInterfaces().stream()
@@ -103,7 +133,7 @@ public class MetricServiceImpl implements MetricService {
                     NetInterface netInterface = NetInterfaceDTORequest.toModel(dto);
                     netInterface.setMetric(metric);
                     return netInterface;
-                }).collect(Collectors.toList());
+                }).toList();
         metric.setNetInterfaces(netInterfaces);
 
         // Сохраняем только родителя — каскад сохранит дочерние

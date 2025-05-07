@@ -21,8 +21,8 @@ public class NetInterface {
     private Double recv;
     private Double packetsSent;
     private Double packetsRecv;
-    private Integer err_in;
-    private Integer err_out;
-    private Integer drop_in;
-    private Integer drop_out;
+    private Integer errIn;
+    private Integer errOut;
+    private Integer dropIn;
+    private Integer dropOut;
 }
