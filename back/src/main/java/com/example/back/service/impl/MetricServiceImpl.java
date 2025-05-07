@@ -65,8 +65,18 @@ public class MetricServiceImpl implements MetricService {
         swap.setMetric(metric);
         metric.setSwap(swap);
 
+
+
         CPU cpu = CPUDTORequest.toModel(metricDTORequest.getCpu());
         cpu.setMetric(metric);
+
+        List<Core> cores = metricDTORequest.getCpu().getCores().stream()
+                .map(dto ->{
+                    Core core = CoresDTORequest.toModel(dto);
+                    core.setCpu(cpu);
+                    return core;
+                }).toList();
+        cpu.setCores(cores);
         metric.setCpu(cpu);
 
         NetworkConnection networkConnection = NetworkConnectionDTORequest.toModel(metricDTORequest.getNetworkConnection());
@@ -78,7 +88,7 @@ public class MetricServiceImpl implements MetricService {
                     Disk disk = DiskDTORequest.toModel(dto);
                     disk.setMetric(metric);
                     return disk;
-                }).collect(Collectors.toList());
+                }).toList();
         metric.setDisks(disks);
 
         List<DiskIO> diskIOs = metricDTORequest.getDiskIo().entrySet().stream()
@@ -86,8 +96,7 @@ public class MetricServiceImpl implements MetricService {
                     DiskIO diskIO = DiskIODTORequest.toModel(entry.getKey(), entry.getValue());
                     diskIO.setMetric(metric);
                     return diskIO;
-                })
-                .collect(Collectors.toList());
+                }).toList();
         metric.setDiskIo(diskIOs);
 
         List<GPU> gpus = metricDTORequest.getGpu().stream()
@@ -95,7 +104,7 @@ public class MetricServiceImpl implements MetricService {
                     GPU gpu = GPUDTORequest.toModel(dto);
                     gpu.setMetric(metric);
                     return gpu;
-                }).collect(Collectors.toList());
+                }).toList();
         metric.setGpu(gpus);
 
         List<NetInterface> netInterfaces = metricDTORequest.getNetInterfaces().stream()
@@ -103,7 +112,7 @@ public class MetricServiceImpl implements MetricService {
                     NetInterface netInterface = NetInterfaceDTORequest.toModel(dto);
                     netInterface.setMetric(metric);
                     return netInterface;
-                }).collect(Collectors.toList());
+                }).toList();
         metric.setNetInterfaces(netInterfaces);
 
         // Сохраняем только родителя — каскад сохранит дочерние

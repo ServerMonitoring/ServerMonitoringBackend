@@ -11,6 +11,7 @@ import lombok.*;
 @Builder
 @ToString
 public class DiskDTORequest {
+    private String device;
     private String mountpoint;
     @JsonProperty("total")
     private Long diskTotal;
@@ -23,6 +24,7 @@ public class DiskDTORequest {
 
     public static Disk toModel(DiskDTORequest diskDTORequest) {
         Disk disk = new Disk();
+        disk.setDevice(diskDTORequest.getDevice());
         disk.setMountpoint(diskDTORequest.getMountpoint());
         disk.setDiskTotal(diskDTORequest.getDiskTotal());
         disk.setDiskUsed(diskDTORequest.getDiskUsed());

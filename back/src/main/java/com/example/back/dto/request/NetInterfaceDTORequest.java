@@ -14,6 +14,10 @@ public class NetInterfaceDTORequest {
     //private String interfaceName;
     private Double sent;
     private Double recv;
+    @JsonProperty("packets_sent")
+    private Double packetsSent;
+    @JsonProperty("packets_recv")
+    private Double packetsRecv;
     @JsonProperty("err_in")
     private Integer errIn;
     @JsonProperty("err_out")
@@ -28,10 +32,12 @@ public class NetInterfaceDTORequest {
         //netInterface.setInterfaceName(netInterfaceDTORequest.getInterfaceName());
         netInterface.setSent(netInterfaceDTORequest.getSent());
         netInterface.setRecv(netInterfaceDTORequest.getRecv());
-        netInterface.setErr_in(netInterfaceDTORequest.getErrIn());
-        netInterface.setErr_out(netInterfaceDTORequest.getErrOut());
-        netInterface.setDrop_in(netInterfaceDTORequest.getDropIn());
-        netInterface.setDrop_out(netInterfaceDTORequest.getDropOut());
+        netInterface.setPacketsSent(netInterfaceDTORequest.getPacketsSent());
+        netInterface.setPacketsRecv(netInterfaceDTORequest.getPacketsRecv());
+        netInterface.setErrIn(netInterfaceDTORequest.getErrIn());
+        netInterface.setErrOut(netInterfaceDTORequest.getErrOut());
+        netInterface.setDropIn(netInterfaceDTORequest.getDropIn());
+        netInterface.setDropOut(netInterfaceDTORequest.getDropOut());
         return netInterface;
 
     }

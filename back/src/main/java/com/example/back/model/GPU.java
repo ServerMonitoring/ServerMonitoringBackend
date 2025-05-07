@@ -21,5 +21,6 @@ public class GPU {
     private Double memoryTotal;
     private Double memoryUsed;
     private Double memoryFree;
+    private Double memoryUsedPercent;
     private Double temperature;
 }
