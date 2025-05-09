@@ -40,7 +40,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         //обрезаем префикс и получаем email из токена
         String jwt = authHeader.substring(BEARER_PREFIX.length());
-        String email = jwtService.extractEmail(jwt);
+        String email = jwtService.extractLogin(jwt);
 
         if(StringUtils.isNotEmpty(email) && SecurityContextHolder.getContext().getAuthentication() == null){
             UserDetails userDetails = customUserDetailsService.loadUserByUsername(email);

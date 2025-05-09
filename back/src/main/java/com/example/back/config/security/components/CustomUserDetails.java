@@ -59,6 +59,9 @@ public class CustomUserDetails implements UserDetails {
         return user.getRole();
     }
 
+    public String getLogin(){
+        return user.getLogin();
+    }
 
     public boolean isAdmin() {
         return  user.getRole().equals(Role.ADMIN);

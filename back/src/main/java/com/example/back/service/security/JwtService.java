@@ -35,14 +35,14 @@ public class JwtService {
     }
 
     /**
-     * Извлечение элек. почты пользователя из токена
+     * Извлечение логина пользователя из токена
      *
      * @param token токен
      * @return элек. почта
      */
-    public String extractEmail(String token){
+    public String extractLogin(String token){
 
-        return extractClaim(token,Claims::getSubject);
+        return extractClaim(token,claims ->  claims.get("login", String.class));
     }
 
     /**
@@ -59,7 +59,7 @@ public class JwtService {
     public JwtData extractData(String token){
         return JwtData.builder()
                 .id(extractId(token))
-                .email(extractEmail(token))
+                .email(extractLogin(token))
                 .role(extractClaim(token, claims -> {
                     String roleStr = claims.get("role", String.class);
                     return roleStr != null ? Role.valueOf(roleStr) : null;
@@ -82,7 +82,7 @@ public class JwtService {
         Map<String, Object> claims = new HashMap<>();
         if (userDetails instanceof CustomUserDetails customUserDetails) {
             claims.put("id", customUserDetails.getId());
-            claims.put("email", customUserDetails.getUsername());
+            claims.put("login", customUserDetails.getLogin());
             claims.put("role", customUserDetails.getRole());
             claims.put("createdDateTime", LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
         }
@@ -98,8 +98,8 @@ public class JwtService {
      */
     public boolean isTokenValid(String token, UserDetails userDetails) {
 
-        final String userName = extractEmail(token);
-        return (userName.equals(userDetails.getUsername())) && !isTokenExpired(token);
+        final String userLogin = extractLogin(token);
+        return (userLogin.equals(userDetails.getUsername())) && !isTokenExpired(token);
     }
 
     /**

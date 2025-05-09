@@ -1,5 +1,8 @@
 package com.example.back.service.impl;
 
+import com.example.back.dto.request.AuthUserRequestDTO;
+import com.example.back.exception.LoginIsMissingException;
+import com.example.back.exception.PasswordIsMissingException;
 import com.example.back.exception.UserAlreadyExistsException;
 import com.example.back.exception.UserNotFoundException;
 import com.example.back.model.Users;
@@ -39,6 +42,33 @@ public class UserServiceImpl implements UserService {
             }
         }catch (UserNotFoundException ignored){
         }
+    }
+
+    @Override
+    @Transactional
+    public Users registerUser(AuthUserRequestDTO requestDTO){
+        Users user = new Users();
+
+
+        Optional.ofNullable(requestDTO.getLogin()).ifPresentOrElse(user::setLogin, () -> {throw new LoginIsMissingException("Login is required to register a user");});
+        Optional.ofNullable(requestDTO.getPassword())
+                .filter(password -> !password.trim().isEmpty())
+                .map(passwordEncoder::encode)
+                .ifPresentOrElse(user::setPassword, () -> {
+                    throw new PasswordIsMissingException("Password is required to register a user");
+                });
+
+        user.setRole(requestDTO.getRole());
+        user.setIsActive(true);
+
+        Optional.ofNullable(requestDTO.getName()).ifPresent(user::setName);
+        Optional.ofNullable(requestDTO.getSurname()).ifPresent(user::setSurname);
+        Optional.ofNullable(requestDTO.getPatronymic()).ifPresent(user::setPatronymic);
+        Optional.ofNullable(requestDTO.getDepartment()).ifPresent(user::setDepartment);
+        Optional.ofNullable(requestDTO.getPosition()).ifPresent(user::setPosition);
+        Optional.ofNullable(requestDTO.getAddInfo()).ifPresent(user::setAddInfo);
+
+        return userRepository.save(user);
     }
 
     @Override
