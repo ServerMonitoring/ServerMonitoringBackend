@@ -51,11 +51,27 @@ public class JwtService {
      * @param token токен
      * @return ID пользователя
      */
-    public Integer extractId(String token) {
+    public Long extractId(String token) {
 
-        return extractClaim(token, claims -> claims.get("id", Integer.class));
+        return extractClaim(token, claims -> claims.get("id", Long.class));
     }
 
+    /**
+     * Извлечение ID сервера из токена
+     *
+     * @param token токен
+     * @return ID сервера
+     */
+    public Long extractServerId(String token) {
+        return extractClaim(token, claims -> claims.get("serverId", Long.class));
+    }
+
+    /**
+     * Извлечение всех данных JwtData из токена
+     *
+     * @param token токен
+     * @return данные JwtData
+     */
     public JwtData extractData(String token){
         return JwtData.builder()
                 .id(extractId(token))
@@ -64,6 +80,7 @@ public class JwtService {
                     String roleStr = claims.get("role", String.class);
                     return roleStr != null ? Role.valueOf(roleStr) : null;
                 }))
+                .serverId(extractServerId(token))
                 .createdDateTime(extractClaim(token, claims -> {
                     String cdts = claims.get("createdDateTime", String.class);
                     return cdts != null ? LocalDateTime.parse(cdts) : null;
@@ -87,6 +104,41 @@ public class JwtService {
             claims.put("createdDateTime", LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
         }
         return generateToken(claims, userDetails);
+    }
+
+
+    /**
+     * Генерация токена для ноды
+     *
+     * @param serverId id сервера
+     * @param userId id юзера
+     * @return токен
+     */
+    public String generateNodeToken(Long serverId, Long userId) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("serverId", serverId);
+        claims.put("userId", userId);
+        claims.put("role", "NODE");
+        return Jwts.builder()
+                .claims(claims)
+                .subject(serverId.toString())
+                .issuedAt(new Date())
+                .signWith(getSigningKey(), Jwts.SIG.HS256)
+                .compact();
+    }
+
+    /**
+     * Является нодой
+     *
+     * @param token токен
+     * @return boolean
+     */
+    public boolean isNodeToken(String token) {
+        Role role = extractClaim(token, claims -> {
+            String roleStr = claims.get("role", String.class);
+            return roleStr != null ? Role.valueOf(roleStr) : null;
+        });
+        return role == Role.NODE;
     }
 
     /**
@@ -130,6 +182,7 @@ public class JwtService {
                 .expiration(new Date(System.currentTimeMillis() + 100000 * 60 * 24))
                 .signWith(getSigningKey(),Jwts.SIG.HS256).compact();
     }
+
 
     /**
      * Проверка токена на просроченность

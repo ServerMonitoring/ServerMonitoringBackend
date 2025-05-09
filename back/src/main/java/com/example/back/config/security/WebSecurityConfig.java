@@ -2,6 +2,7 @@ package com.example.back.config.security;
 
 
 import com.example.back.config.security.components.JwtAuthenticationFilter;
+import com.example.back.config.security.components.NodeAuthenticationFilter;
 import com.example.back.model.enums.Role;
 import com.example.back.service.security.CustomUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,11 +50,16 @@ public class WebSecurityConfig {
     private String[] allowedHeaders;
 
     JwtAuthenticationFilter jwtAuthenticationFilter;
+    NodeAuthenticationFilter nodeAuthenticationFilter;
 
-    @Autowired
+
+   @Autowired
     public void setJwtAuthenticationFilter(@Lazy JwtAuthenticationFilter jwtAuthenticationFilter){
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
     }
+    @Autowired
+    public void setNodeAuthenticationFilter(@Lazy NodeAuthenticationFilter nodeAuthenticationFilter){this.nodeAuthenticationFilter = nodeAuthenticationFilter;
+   }
 
     @Bean
     public UserDetailsService userDetailsService(){
@@ -76,24 +82,15 @@ public class WebSecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/**").permitAll()
 
-                        .requestMatchers("/api/type_of_service/get").hasAnyAuthority( Role.ADMIN.name(), Role.USER.name())
-                        .requestMatchers("/api/service_detail/get_all_services").hasAnyAuthority(Role.ADMIN.name(), Role.USER.name())
-
-                        .requestMatchers(
-                                "/api/aggregator/**",
-                                "/api/connection_request/**",
-                                "/api/type_of_service/**"
-                        ).hasAuthority(Role.ADMIN.name())
-
-                        .requestMatchers("/api/customer/**").hasAuthority(Role.ADMIN.name())
-
-                        .requestMatchers("/api/organization/**","/api/service_detail/**").hasAuthority(Role.ADMIN.name())
+                        .requestMatchers("/api/node/**").hasRole(Role.NODE.name())
 
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider())
+                .addFilterBefore(nodeAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+
                 .build();
     }
 

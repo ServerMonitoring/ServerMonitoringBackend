@@ -12,8 +12,9 @@ import java.time.LocalDateTime;
 @Builder
 @ToString
 public class JwtData {
-    private Integer id;
+    private Long id;
     private String email;
     private Role role;
     private LocalDateTime createdDateTime;
+    private Long serverId;
 }

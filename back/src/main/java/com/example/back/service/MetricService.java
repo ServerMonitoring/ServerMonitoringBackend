@@ -6,8 +6,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 public interface MetricService {
     @Transactional
-    void saveStaticMetrics(Long serverId, StaticMetricDTORequest dtoRequest);
+    void saveStaticMetrics(String nodeToken, StaticMetricDTORequest dtoRequest);
 
     @Transactional
-    void saveMetrics(Long serverId, MetricDTORequest metricDTORequest);
+    void saveMetrics(String nodeToken, MetricDTORequest metricDTORequest);
 }
