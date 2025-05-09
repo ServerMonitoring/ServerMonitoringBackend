@@ -2,6 +2,7 @@ package com.example.back.config.security;
 
 
 import com.example.back.config.security.components.JwtAuthenticationFilter;
+import com.example.back.config.security.components.NodeAuthenticationFilter;
 import com.example.back.model.enums.Role;
 import com.example.back.service.security.CustomUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,12 +49,19 @@ public class WebSecurityConfig {
     @Value("${cors.allowed-headers}")
     private String[] allowedHeaders;
 
-    JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final NodeAuthenticationFilter nodeAuthenticationFilter;
 
     @Autowired
+    public WebSecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter, NodeAuthenticationFilter nodeAuthenticationFilter) {
+        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+        this.nodeAuthenticationFilter = nodeAuthenticationFilter;
+    }
+
+   /* @Autowired
     public void setJwtAuthenticationFilter(@Lazy JwtAuthenticationFilter jwtAuthenticationFilter){
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
-    }
+    }*/
 
     @Bean
     public UserDetailsService userDetailsService(){
@@ -93,7 +101,9 @@ public class WebSecurityConfig {
                 )
                 .sessionManagement(manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider())
+                .addFilterBefore(nodeAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+
                 .build();
     }
 
