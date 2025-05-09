@@ -41,4 +41,17 @@ public class ServerServiceImpl implements ServerService {
 
         return jwtService.generateNodeToken(savedServer.getServerId(),id);
     }
+
+    @Override
+    public String updateNodeToken(Long serverId, String token){
+        Long id = jwtService.extractId(token);
+        Users user = userRepository.findById(id).orElseThrow(()-> new UserNotFoundException("User not found"));
+        Server server = serverRepository.findById(serverId).orElseThrow(()-> new UserNotFoundException("Server not found"));
+
+        if (!user.getUserId().equals(server.getUsers().getUserId())) {
+            throw new UserNotFoundException("Server does not belong to user");
+        }
+
+        return jwtService.generateNodeToken(server.getServerId(),id);
+    }
 }
