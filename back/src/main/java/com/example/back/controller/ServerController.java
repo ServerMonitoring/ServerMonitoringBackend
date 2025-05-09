@@ -30,4 +30,5 @@ public class ServerController {
         String nodeToken = serverService.addServer(server, userToken);
         return ResponseEntity.status(HttpStatus.CREATED).body(nodeToken);
     }
+
 }
