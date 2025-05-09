@@ -38,7 +38,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
-        //обрезаем префикс и получаем email из токена
+        //обрезаем префикс и получаем login из токена
         String jwt = authHeader.substring(BEARER_PREFIX.length());
         String email = jwtService.extractLogin(jwt);
 
