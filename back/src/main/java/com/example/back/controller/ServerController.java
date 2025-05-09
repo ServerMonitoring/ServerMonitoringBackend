@@ -31,4 +31,13 @@ public class ServerController {
         return ResponseEntity.status(HttpStatus.CREATED).body(nodeToken);
     }
 
+    @PostMapping("/token/refresh")
+    public ResponseEntity<String> refreshNodeToken(@RequestHeader(HttpHeaders.AUTHORIZATION) String token, @RequestBody Long serverId ) {
+        if (!token.startsWith("Bearer ")) {
+            throw new IllegalArgumentException("Invalid authorization header");
+        }
+        String userToken = token.substring("Bearer ".length());
+        String nodeToken = serverService.updateNodeToken(serverId, userToken);
+        return ResponseEntity.status(HttpStatus.CREATED).body(nodeToken);
+    }
 }
