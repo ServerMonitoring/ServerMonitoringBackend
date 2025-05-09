@@ -20,7 +20,7 @@ public class Server {
 
     private String hostname;
     private String osInfo;
-    private String ipAddress;
+    private String address;
     private String addInfo;
     private boolean online;
     private String cpuModel;

@@ -5,6 +5,7 @@ import com.example.back.model.*;
 import com.example.back.repository.MetricRepository;
 import com.example.back.repository.ServerRepository;
 import com.example.back.service.*;
+import com.example.back.service.security.JwtService;
 import com.example.back.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,16 +19,19 @@ public class MetricServiceImpl implements MetricService {
     private final MetricRepository metricRepository;
 
     private final ServerRepository serverRepository;
+    private final JwtService jwtService;
 
     @Autowired
-    public MetricServiceImpl(MetricRepository metricRepository, ServerRepository serverRepository ) {
+    public MetricServiceImpl(MetricRepository metricRepository, ServerRepository serverRepository, JwtService jwtService) {
         this.metricRepository = metricRepository;
         this.serverRepository = serverRepository;
+        this.jwtService = jwtService;
     }
 
     @Override
     @Transactional
-    public void saveStaticMetrics(Long serverId, StaticMetricDTORequest dtoRequest){
+    public void saveStaticMetrics(String nodeToken, StaticMetricDTORequest dtoRequest){
+        Long serverId = jwtService.extractServerId(nodeToken);
         Server server = serverRepository.findById(serverId)
                 .orElseThrow(() -> new RuntimeException("Server not found"));
 
@@ -48,8 +52,8 @@ public class MetricServiceImpl implements MetricService {
 
     @Override
     @Transactional
-    public void saveMetrics(Long serverId, MetricDTORequest metricDTORequest) {
-
+    public void saveMetrics(String nodeToken, MetricDTORequest metricDTORequest) {
+        Long serverId = jwtService.extractServerId(nodeToken);
         Server server = serverRepository.findById(serverId)
                 .orElseThrow(() -> new RuntimeException("Server not found"));
 

@@ -118,9 +118,10 @@ public class JwtService {
         Map<String, Object> claims = new HashMap<>();
         claims.put("serverId", serverId);
         claims.put("userId", userId);
+        claims.put("role", "NODE");
         return Jwts.builder()
                 .claims(claims)
-                .subject("node")
+                .subject(serverId.toString())
                 .issuedAt(new Date())
                 .signWith(getSigningKey(), Jwts.SIG.HS256)
                 .compact();

@@ -26,7 +26,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class NodeAuthenticationFilter extends OncePerRequestFilter {
 
-    public static final String HEADER_NAME = "X-API-Key";
+    private static final String HEADER_NAME = "X-API-Key";
 
     private final JwtService jwtService;
 
@@ -34,6 +34,7 @@ public class NodeAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, @NonNull HttpServletResponse response,@NonNull FilterChain filterChain) throws ServletException, IOException {
 
         String apiKey = request.getHeader(HEADER_NAME);
+
 
         if (StringUtils.isEmpty(apiKey)) {
             filterChain.doFilter(request, response);
@@ -47,7 +48,7 @@ public class NodeAuthenticationFilter extends OncePerRequestFilter {
                     Long nodeId = jwtService.extractServerId(apiKey);
 
                     SecurityContext context = SecurityContextHolder.createEmptyContext();
-                    Collection<? extends GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("NODE"));
+                    Collection<? extends GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_NODE"));
 
                     NodeAuthentication authenticationToken = new NodeAuthentication(
                             nodeId.toString(),

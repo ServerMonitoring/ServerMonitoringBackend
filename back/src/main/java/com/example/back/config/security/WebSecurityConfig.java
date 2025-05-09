@@ -49,19 +49,17 @@ public class WebSecurityConfig {
     @Value("${cors.allowed-headers}")
     private String[] allowedHeaders;
 
-    private final JwtAuthenticationFilter jwtAuthenticationFilter;
-    private final NodeAuthenticationFilter nodeAuthenticationFilter;
+    JwtAuthenticationFilter jwtAuthenticationFilter;
+    NodeAuthenticationFilter nodeAuthenticationFilter;
 
-    @Autowired
-    public WebSecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter, NodeAuthenticationFilter nodeAuthenticationFilter) {
-        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
-        this.nodeAuthenticationFilter = nodeAuthenticationFilter;
-    }
 
-   /* @Autowired
+   @Autowired
     public void setJwtAuthenticationFilter(@Lazy JwtAuthenticationFilter jwtAuthenticationFilter){
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
-    }*/
+    }
+    @Autowired
+    public void setNodeAuthenticationFilter(@Lazy NodeAuthenticationFilter nodeAuthenticationFilter){this.nodeAuthenticationFilter = nodeAuthenticationFilter;
+   }
 
     @Bean
     public UserDetailsService userDetailsService(){
@@ -84,18 +82,7 @@ public class WebSecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/**").permitAll()
 
-                        .requestMatchers("/api/type_of_service/get").hasAnyAuthority( Role.ADMIN.name(), Role.USER.name())
-                        .requestMatchers("/api/service_detail/get_all_services").hasAnyAuthority(Role.ADMIN.name(), Role.USER.name())
-
-                        .requestMatchers(
-                                "/api/aggregator/**",
-                                "/api/connection_request/**",
-                                "/api/type_of_service/**"
-                        ).hasAuthority(Role.ADMIN.name())
-
-                        .requestMatchers("/api/customer/**").hasAuthority(Role.ADMIN.name())
-
-                        .requestMatchers("/api/organization/**","/api/service_detail/**").hasAuthority(Role.ADMIN.name())
+                        .requestMatchers("/api/node/**").hasRole(Role.NODE.name())
 
                         .anyRequest().authenticated()
                 )
