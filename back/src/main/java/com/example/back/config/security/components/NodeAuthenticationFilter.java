@@ -1,5 +1,6 @@
 package com.example.back.config.security.components;
 
+import com.example.back.model.enums.Role;
 import com.example.back.service.security.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -48,7 +49,7 @@ public class NodeAuthenticationFilter extends OncePerRequestFilter {
                     Long nodeId = jwtService.extractServerId(apiKey);
 
                     SecurityContext context = SecurityContextHolder.createEmptyContext();
-                    Collection<? extends GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_NODE"));
+                    Collection<? extends GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(Role.NODE.name()));
 
                     NodeAuthentication authenticationToken = new NodeAuthentication(
                             nodeId.toString(),

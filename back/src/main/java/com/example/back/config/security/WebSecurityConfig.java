@@ -82,7 +82,7 @@ public class WebSecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/**").permitAll()
 
-                        .requestMatchers("/api/node/**").hasRole(Role.NODE.name())
+                        .requestMatchers("/api/node/**").hasAuthority(Role.NODE.name())
 
                         .anyRequest().authenticated()
                 )
