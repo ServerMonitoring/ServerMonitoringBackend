@@ -90,7 +90,6 @@ public class WebSecurityConfig {
                 .authenticationProvider(authenticationProvider())
                 .addFilterBefore(nodeAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-
                 .build();
     }
 
