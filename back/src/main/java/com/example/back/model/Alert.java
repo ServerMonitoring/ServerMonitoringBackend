@@ -18,7 +18,7 @@ public class Alert {
     @JoinColumn(name = "server_id")
     private Server server;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "threshold_id")
     private AlertThreshold threshold;
 
