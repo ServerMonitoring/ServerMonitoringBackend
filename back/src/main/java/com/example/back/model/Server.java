@@ -35,4 +35,11 @@ public class Server {
 
     @OneToMany(mappedBy = "server", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Log> logs;
+
+    @OneToMany(mappedBy = "server", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<AlertThreshold> alertThresholds;
+
+    @OneToMany(mappedBy = "server", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Alert> alerts;
+
 }
