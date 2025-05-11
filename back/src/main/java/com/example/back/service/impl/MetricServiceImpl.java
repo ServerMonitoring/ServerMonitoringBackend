@@ -7,6 +7,7 @@ import com.example.back.repository.ServerRepository;
 import com.example.back.service.*;
 import com.example.back.service.security.JwtService;
 import com.example.back.util.EntityUtils;
+import com.example.back.util.alert.AlertEvaluationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,13 +18,14 @@ import java.util.List;
 public class MetricServiceImpl implements MetricService {
 
     private final MetricRepository metricRepository;
-
+    private final AlertEvaluationService alertEvaluationService;
     private final ServerRepository serverRepository;
     private final JwtService jwtService;
 
     @Autowired
-    public MetricServiceImpl(MetricRepository metricRepository, ServerRepository serverRepository, JwtService jwtService) {
+    public MetricServiceImpl(MetricRepository metricRepository, AlertEvaluationService alertEvaluationService, ServerRepository serverRepository, JwtService jwtService) {
         this.metricRepository = metricRepository;
+        this.alertEvaluationService = alertEvaluationService;
         this.serverRepository = serverRepository;
         this.jwtService = jwtService;
     }
@@ -142,5 +144,6 @@ public class MetricServiceImpl implements MetricService {
 
         // Сохраняем только родителя — каскад сохранит дочерние
         metricRepository.save(metric);
+        alertEvaluationService.evaluateAndSaveAlerts(server,metricDTORequest,server.getUsers().getPreferredLanguage());
     }
 }

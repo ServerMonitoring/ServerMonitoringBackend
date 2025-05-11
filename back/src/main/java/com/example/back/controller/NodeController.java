@@ -25,13 +25,13 @@ public class NodeController {
     public ResponseEntity<String> saveMetric(@RequestBody MetricDTORequest metricDTORequest,@RequestHeader(value = HEADER_NAME) String token) {
 
         metricService.saveMetrics(token,metricDTORequest);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+        return ResponseEntity.status(HttpStatus.OK).body("success save changeable metric");
     }
 
     @PostMapping("/static")
     public ResponseEntity<String> saveStaticMetric(@RequestBody StaticMetricDTORequest staticMetricDTORequest,@RequestHeader(value = HEADER_NAME) String token) {
 
         metricService.saveStaticMetrics(token,staticMetricDTORequest);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+        return ResponseEntity.status(HttpStatus.OK).body("success save static metric");
     }
 }

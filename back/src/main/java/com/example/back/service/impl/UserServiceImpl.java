@@ -82,6 +82,7 @@ public class UserServiceImpl implements UserService {
             admin.setLogin(defaultLogin);
             admin.setPassword(passwordEncoder.encode(defaultPassword));
             admin.setRole(Role.ADMIN);
+            admin.setIsActive(true);
             userRepository.save(admin);
 
         }

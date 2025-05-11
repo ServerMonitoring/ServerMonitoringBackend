@@ -1,5 +1,6 @@
 package com.example.back.model;
 
+import com.example.back.model.enums.PreferredLanguage;
 import com.example.back.model.enums.Role;
 import jakarta.persistence.*;
 import lombok.*;
@@ -23,6 +24,7 @@ public class Users {
     private String login;
     private String password;
     private Boolean isActive;
+    private PreferredLanguage preferredLanguage;
 
     @Enumerated(EnumType.STRING)
     private Role role;
