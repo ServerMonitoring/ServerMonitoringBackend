@@ -24,6 +24,7 @@ public class Users {
     private String login;
     private String password;
     private Boolean isActive;
+    //задано числом нумерация enum с 0
     private PreferredLanguage preferredLanguage;
 
     @Enumerated(EnumType.STRING)
