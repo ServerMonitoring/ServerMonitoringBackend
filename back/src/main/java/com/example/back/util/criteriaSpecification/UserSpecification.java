@@ -14,6 +14,26 @@ public class UserSpecification {
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
 
+            if (!criteria.getName().isBlank()){
+                predicates.add(criteriaBuilder.like(root.get("name"),"%"+ criteria.getName() + "%"));
+            }
+            if (!criteria.getSurname().isBlank()){
+                predicates.add(criteriaBuilder.like(root.get("surname"), "%"+ criteria.getSurname()+"%"));
+            }
+            if (!criteria.getPatronymic().isBlank()){
+                predicates.add(criteriaBuilder.like(root.get("patronymic"), "%"+ criteria.getPatronymic() +"%"));
+            }
+            if (!criteria.getDepartment().isBlank()){
+                predicates.add(criteriaBuilder.like(root.get("department"), "%"+ criteria.getDepartment()+"%"));
+            }
+            if (!criteria.getPosition().isBlank()){
+                predicates.add(criteriaBuilder.like(root.get("position"), "%"+ criteria.getPosition()+"%"));
+            }
+            if (!criteria.getLogin().isBlank()){
+                predicates.add(criteriaBuilder.like(root.get("login"), "%"+ criteria.getLogin()+"%"));
+            }
+
+
             predicates.addAll(BaseEntitySpecifications.byBaseCriteria(root, query, criteriaBuilder, criteria));
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };
