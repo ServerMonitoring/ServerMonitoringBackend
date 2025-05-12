@@ -22,7 +22,7 @@ public class Server {
     private String osInfo;
     private String address;
     private String addInfo;
-    private boolean online;
+    private Boolean online;
     private String cpuModel;
     private Integer cpuCountCores;
     private Integer cpuCountCoresPhysical;
