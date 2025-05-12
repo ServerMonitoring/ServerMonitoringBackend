@@ -7,6 +7,8 @@ import lombok.*;
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor
-public class DiskIOSearchCriteria {
+public class DiskIOSearchCriteria{
+    private BaseSearchCriteria baseCriteria = new BaseSearchCriteria();
+    private MetricTimeSearchCriteria metricTimeCriteria = new MetricTimeSearchCriteria();
     private String driveName;
 }

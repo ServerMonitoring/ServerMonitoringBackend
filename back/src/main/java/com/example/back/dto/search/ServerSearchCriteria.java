@@ -8,7 +8,7 @@ import lombok.*;
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor
-public class ServerSearchCriteria {
+public class ServerSearchCriteria extends BaseSearchCriteria {
 
     private Long userId;
     private String hostname;

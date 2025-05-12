@@ -7,6 +7,8 @@ import lombok.*;
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor
-public class GPUSearchCriteria {
+public class GPUSearchCriteria  {
+    private BaseSearchCriteria baseCriteria = new BaseSearchCriteria();
+    private MetricTimeSearchCriteria metricTimeCriteria = new MetricTimeSearchCriteria();
     private String gpuName;
 }

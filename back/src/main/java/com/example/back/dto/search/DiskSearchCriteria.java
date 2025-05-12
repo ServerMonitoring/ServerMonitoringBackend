@@ -7,7 +7,9 @@ import lombok.*;
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor
-public class DiskSearchCriteria {
+public class DiskSearchCriteria  {
+    private BaseSearchCriteria baseCriteria = new BaseSearchCriteria();
+    private MetricTimeSearchCriteria metricTimeCriteria = new MetricTimeSearchCriteria();
     private String device;
     private String mountpoint;
 }

@@ -7,7 +7,7 @@ import lombok.*;
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserSearchCriteria {
+public class UserSearchCriteria extends BaseSearchCriteria {
     private String name;
     private String surname;
     private String patronymic;
