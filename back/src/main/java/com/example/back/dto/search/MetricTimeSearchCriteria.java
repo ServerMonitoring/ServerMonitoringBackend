@@ -9,7 +9,9 @@ import java.time.Instant;
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor
-public class MetricsTimeSearchCriteria {
+public class MetricTimeSearchCriteria {
     private Instant startTime;
     private Instant endTime;
+    private Instant currentTime;
+    private Long metricId;
 }
