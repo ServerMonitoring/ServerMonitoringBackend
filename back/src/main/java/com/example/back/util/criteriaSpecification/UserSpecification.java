@@ -13,6 +13,8 @@ public class UserSpecification {
     public static Specification<Users> byCriteria(UserSearchCriteria criteria) {
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
+
+            predicates.addAll(BaseEntitySpecifications.byBaseCriteria(root, query, criteriaBuilder, criteria));
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };
     }
