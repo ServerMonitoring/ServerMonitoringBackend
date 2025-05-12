@@ -12,7 +12,7 @@ import java.util.List;
 
 public class DiskIOSpecification {
 
-    public static  Specification<DiskIOSpecification> byCriteria(DiskIOSearchCriteria criteria) {
+    public static  Specification<DiskIO> byCriteria(DiskIOSearchCriteria criteria) {
 
         return ((root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
