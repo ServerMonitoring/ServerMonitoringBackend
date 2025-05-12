@@ -20,7 +20,7 @@ public class GPUSpecification {
             Join<GPU, Metric> metricJoin = root.join("metric");
 
             if (!criteria.getGpuName().isBlank()){
-                predicates.add(criteriaBuilder.equal(metricJoin.get("gpuName"), criteria.getGpuName()));
+                predicates.add(criteriaBuilder.like(metricJoin.get("gpuName"), "%"+ criteria.getGpuName() +"%"));
             }
 
             predicates.addAll(MetricTimeSpecifications.byMetricTimeCriteria(metricJoin, criteriaBuilder, criteria.getMetricTimeCriteria()));
