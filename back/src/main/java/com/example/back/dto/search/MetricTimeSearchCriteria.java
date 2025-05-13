@@ -14,4 +14,5 @@ public class MetricTimeSearchCriteria {
     private Instant endTime;
     private Instant currentTime;
     private Long metricId;
+    private Long serverID;
 }
