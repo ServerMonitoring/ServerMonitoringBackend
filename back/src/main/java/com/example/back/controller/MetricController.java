@@ -1,16 +1,10 @@
 package com.example.back.controller;
 
 import com.example.back.dto.request.BaseAndMetricSearchRequestDTO;
-import com.example.back.dto.response.CPUResponseDTO;
-import com.example.back.dto.response.MemoryResponseDTO;
-import com.example.back.dto.response.MetricResponseDTO;
-import com.example.back.dto.response.SwapResponseDTO;
+import com.example.back.dto.response.*;
 import com.example.back.dto.search.BaseSearchCriteria;
 import com.example.back.dto.search.MetricTimeSearchCriteria;
-import com.example.back.service.CPUService;
-import com.example.back.service.MemoryService;
-import com.example.back.service.MetricService;
-import com.example.back.service.SwapService;
+import com.example.back.service.*;
 import com.example.back.util.ExtractCriteria;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -30,15 +24,17 @@ public class MetricController {
     private final MemoryService memoryService;
     private final SwapService swapService;
     private final CPUService cpuService;
+    private final NetworkConnectionServce networkConnectionService;
     private final ExtractCriteria extractCriteria;
 
 
     @Autowired
-    public MetricController(MetricService metricService, MemoryService memoryService, SwapService swapService, CPUService cpuService, ExtractCriteria extractCriteria) {
+    public MetricController(MetricService metricService, MemoryService memoryService, SwapService swapService, CPUService cpuService, NetworkConnectionServce networkConnectionService, ExtractCriteria extractCriteria) {
         this.metricService = metricService;
         this.memoryService = memoryService;
         this.swapService = swapService;
         this.cpuService = cpuService;
+        this.networkConnectionService = networkConnectionService;
         this.extractCriteria = extractCriteria;
     }
 
@@ -80,5 +76,15 @@ public class MetricController {
         List<CPUResponseDTO> cpus = cpuService.getCPUByCriteria(baseSearchCriteria, metricTimeSearchCriteria);
 
         return ResponseEntity.status(HttpStatus.OK).body(cpus);
+    }
+
+    @PostMapping("/network_connection")
+    public ResponseEntity<List<NetworkConnectionResponseDTO>> getNetworkConnections(@RequestBody BaseAndMetricSearchRequestDTO requestDTO) {
+        BaseSearchCriteria baseSearchCriteria = extractCriteria.extractBaseSearchCriteria(requestDTO);
+        MetricTimeSearchCriteria metricTimeSearchCriteria = extractCriteria.extractMetricTimeSearchCriteria(requestDTO);
+
+        List<NetworkConnectionResponseDTO> networkConnections = networkConnectionService.getNetworkConnectionsByCriteria(baseSearchCriteria, metricTimeSearchCriteria);
+
+        return ResponseEntity.status(HttpStatus.OK).body(networkConnections);
     }
 }
