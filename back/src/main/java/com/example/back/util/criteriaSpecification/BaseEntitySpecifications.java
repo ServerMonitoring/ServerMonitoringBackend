@@ -20,7 +20,7 @@ public class BaseEntitySpecifications {
         if (criteria.getDistinct()) {
             query.distinct(true);
         }
-        if (!criteria.getSortBy().isBlank()) {
+        if (criteria.getSortBy() != null && !criteria.getSortBy().isBlank()) {
             String sortBy = criteria.getSortBy().trim();
             boolean descending = sortBy.startsWith("-");
             if (descending) {

@@ -19,10 +19,10 @@ public class DiskSpecification {
             List<Predicate> predicates = new ArrayList<>();
             Join<Disk, Metric> metricJoin = root.join("metric");
 
-            if (!criteria.getDevice().isBlank()){
+            if (criteria.getDevice() != null && !criteria.getDevice().isBlank()){
                 predicates.add(criteriaBuilder.like(root.get("device"), "%"+ criteria.getDevice() +"%"));
             }
-            if (!criteria.getMountpoint().isBlank()){
+            if (criteria.getMountpoint() != null && !criteria.getMountpoint().isBlank()){
                 predicates.add(criteriaBuilder.like(root.get("mountpoint"), "%"+ criteria.getMountpoint() +"%"));
             }
 

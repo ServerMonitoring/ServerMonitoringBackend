@@ -18,8 +18,8 @@ public class DiskIOSpecification {
             List<Predicate> predicates = new ArrayList<>();
             Join<DiskIO, Metric> metricJoin = root.join("metric");
 
-            if (!criteria.getDriveName().isBlank()) {
-                predicates.add(criteriaBuilder.like(metricJoin.get("driveName"), "%"+ criteria.getDriveName() +"%"));
+            if (criteria.getDriveName() != null && !criteria.getDriveName().isBlank()) {
+                predicates.add(criteriaBuilder.like(root.get("driveName"), "%"+ criteria.getDriveName() +"%"));
             }
 
             predicates.addAll(MetricTimeSpecifications.byMetricTimeCriteria(metricJoin, criteriaBuilder, criteria.getMetricTimeCriteria()));

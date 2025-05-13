@@ -14,22 +14,22 @@ public class UserSpecification {
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
 
-            if (!criteria.getName().isBlank()){
+            if (criteria.getName() != null && !criteria.getName().isBlank()){
                 predicates.add(criteriaBuilder.like(root.get("name"),"%"+ criteria.getName() + "%"));
             }
-            if (!criteria.getSurname().isBlank()){
+            if (criteria.getSurname() != null && !criteria.getSurname().isBlank()){
                 predicates.add(criteriaBuilder.like(root.get("surname"), "%"+ criteria.getSurname()+"%"));
             }
-            if (!criteria.getPatronymic().isBlank()){
+            if (criteria.getPatronymic() != null && !criteria.getPatronymic().isBlank()){
                 predicates.add(criteriaBuilder.like(root.get("patronymic"), "%"+ criteria.getPatronymic() +"%"));
             }
-            if (!criteria.getDepartment().isBlank()){
+            if (criteria.getDepartment() != null && !criteria.getDepartment().isBlank()){
                 predicates.add(criteriaBuilder.like(root.get("department"), "%"+ criteria.getDepartment()+"%"));
             }
-            if (!criteria.getPosition().isBlank()){
+            if (criteria.getPosition() != null && !criteria.getPosition().isBlank()){
                 predicates.add(criteriaBuilder.like(root.get("position"), "%"+ criteria.getPosition()+"%"));
             }
-            if (!criteria.getLogin().isBlank()){
+            if (criteria.getLogin() != null && !criteria.getLogin().isBlank()){
                 predicates.add(criteriaBuilder.like(root.get("login"), "%"+ criteria.getLogin()+"%"));
             }
 
