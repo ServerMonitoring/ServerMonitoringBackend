@@ -43,6 +43,9 @@ public class MetricController {
 
     @PostMapping()
     public ResponseEntity<List<MetricResponseDTO>> getMetric(@RequestBody(required = false) BaseAndMetricSearchRequestDTO requestDTO) {
+        if (requestDTO == null) {
+            requestDTO = new BaseAndMetricSearchRequestDTO();
+        }
         BaseSearchCriteria baseSearchCriteria = extractCriteria.extractBaseSearchCriteria(requestDTO);
         MetricTimeSearchCriteria metricTimeSearchCriteria = extractCriteria.extractMetricTimeSearchCriteria(requestDTO);
 
