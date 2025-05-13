@@ -6,6 +6,6 @@ import com.example.back.dto.search.MetricTimeSearchCriteria;
 
 import java.util.List;
 
-public interface NetworkConnectionServce {
+public interface NetworkConnectionService {
     List<NetworkConnectionResponseDTO> getNetworkConnectionsByCriteria(BaseSearchCriteria baseCriteria, MetricTimeSearchCriteria metricCriteria);
 }

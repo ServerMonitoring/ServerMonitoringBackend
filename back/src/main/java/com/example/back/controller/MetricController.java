@@ -24,12 +24,12 @@ public class MetricController {
     private final MemoryService memoryService;
     private final SwapService swapService;
     private final CPUService cpuService;
-    private final NetworkConnectionServce networkConnectionService;
+    private final NetworkConnectionService networkConnectionService;
     private final ExtractCriteria extractCriteria;
 
 
     @Autowired
-    public MetricController(MetricService metricService, MemoryService memoryService, SwapService swapService, CPUService cpuService, NetworkConnectionServce networkConnectionService, ExtractCriteria extractCriteria) {
+    public MetricController(MetricService metricService, MemoryService memoryService, SwapService swapService, CPUService cpuService, NetworkConnectionService networkConnectionService, ExtractCriteria extractCriteria) {
         this.metricService = metricService;
         this.memoryService = memoryService;
         this.swapService = swapService;
