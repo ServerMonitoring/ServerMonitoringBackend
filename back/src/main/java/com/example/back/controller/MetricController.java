@@ -93,6 +93,9 @@ public class MetricController {
 
     @PostMapping("/disks")
     public ResponseEntity<List<DiskResponseDTO>> getDisks(@RequestBody(required = false) DiskSearchCriteria criteria) {
+        if (criteria == null) {
+            criteria = new DiskSearchCriteria();
+        }
         List<DiskResponseDTO> disks = diskService.getDisksByCriteria(criteria);
 
         return ResponseEntity.status(HttpStatus.OK).body(disks);
