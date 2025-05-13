@@ -3,6 +3,7 @@ package com.example.back.controller;
 import com.example.back.dto.request.BaseAndMetricSearchRequestDTO;
 import com.example.back.dto.response.*;
 import com.example.back.dto.search.BaseSearchCriteria;
+import com.example.back.dto.search.DiskSearchCriteria;
 import com.example.back.dto.search.MetricTimeSearchCriteria;
 import com.example.back.service.*;
 import com.example.back.util.ExtractCriteria;
@@ -25,16 +26,18 @@ public class MetricController {
     private final SwapService swapService;
     private final CPUService cpuService;
     private final NetworkConnectionService networkConnectionService;
+    private final DiskService diskService;
     private final ExtractCriteria extractCriteria;
 
 
     @Autowired
-    public MetricController(MetricService metricService, MemoryService memoryService, SwapService swapService, CPUService cpuService, NetworkConnectionService networkConnectionService, ExtractCriteria extractCriteria) {
+    public MetricController(MetricService metricService, MemoryService memoryService, SwapService swapService, CPUService cpuService, NetworkConnectionService networkConnectionService, DiskService diskService, ExtractCriteria extractCriteria) {
         this.metricService = metricService;
         this.memoryService = memoryService;
         this.swapService = swapService;
         this.cpuService = cpuService;
         this.networkConnectionService = networkConnectionService;
+        this.diskService = diskService;
         this.extractCriteria = extractCriteria;
     }
 
@@ -79,12 +82,19 @@ public class MetricController {
     }
 
     @PostMapping("/network_connection")
-    public ResponseEntity<List<NetworkConnectionResponseDTO>> getNetworkConnections(@RequestBody BaseAndMetricSearchRequestDTO requestDTO) {
+    public ResponseEntity<List<NetworkConnectionResponseDTO>> getNetworkConnections(@RequestBody(required = false) BaseAndMetricSearchRequestDTO requestDTO) {
         BaseSearchCriteria baseSearchCriteria = extractCriteria.extractBaseSearchCriteria(requestDTO);
         MetricTimeSearchCriteria metricTimeSearchCriteria = extractCriteria.extractMetricTimeSearchCriteria(requestDTO);
 
         List<NetworkConnectionResponseDTO> networkConnections = networkConnectionService.getNetworkConnectionsByCriteria(baseSearchCriteria, metricTimeSearchCriteria);
 
         return ResponseEntity.status(HttpStatus.OK).body(networkConnections);
+    }
+
+    @PostMapping("/disks")
+    public ResponseEntity<List<DiskResponseDTO>> getDisks(@RequestBody(required = false) DiskSearchCriteria criteria) {
+        List<DiskResponseDTO> disks = diskService.getDisksByCriteria(criteria);
+
+        return ResponseEntity.status(HttpStatus.OK).body(disks);
     }
 }
