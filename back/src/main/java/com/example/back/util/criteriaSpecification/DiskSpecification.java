@@ -20,10 +20,10 @@ public class DiskSpecification {
             Join<Disk, Metric> metricJoin = root.join("metric");
 
             if (!criteria.getDevice().isBlank()){
-                predicates.add(criteriaBuilder.like(metricJoin.get("device"), "%"+ criteria.getDevice() +"%"));
+                predicates.add(criteriaBuilder.like(root.get("device"), "%"+ criteria.getDevice() +"%"));
             }
             if (!criteria.getMountpoint().isBlank()){
-                predicates.add(criteriaBuilder.like(metricJoin.get("mountpoint"), "%"+ criteria.getMountpoint() +"%"));
+                predicates.add(criteriaBuilder.like(root.get("mountpoint"), "%"+ criteria.getMountpoint() +"%"));
             }
 
             predicates.addAll(MetricTimeSpecifications.byMetricTimeCriteria(metricJoin, criteriaBuilder, criteria.getMetricTimeCriteria()));
