@@ -33,7 +33,7 @@ public class ServerServiceImpl implements ServerService {
 
         server.setUsers(user);
 
-
+        Optional.ofNullable(requestDTO.getServerName()).ifPresent(server::setServerName);
         Optional.ofNullable(requestDTO.getAddress()).ifPresent(server::setAddress);
         Optional.ofNullable(requestDTO.getAddInfo()).ifPresent(server::setAddInfo);
 

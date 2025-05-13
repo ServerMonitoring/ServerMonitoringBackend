@@ -11,6 +11,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class ServerCreateRequestDTO {
 
+    private String serverName;
     private String address;
     private String addInfo;
 
