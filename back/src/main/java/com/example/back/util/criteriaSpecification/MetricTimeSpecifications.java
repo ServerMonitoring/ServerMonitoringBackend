@@ -33,6 +33,10 @@ public class MetricTimeSpecifications {
             predicates.add(criteriaBuilder.equal(metricJoin.get("timestamp"), criteria.getCurrentTime()));
         }
 
+        if (criteria.getServerID() != null){
+            predicates.add(criteriaBuilder.equal(metricJoin.get("server").get("serverId"), criteria.getServerID()));
+        }
+
         return predicates;
     }
 }
