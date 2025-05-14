@@ -2,10 +2,7 @@ package com.example.back.controller;
 
 import com.example.back.dto.request.BaseAndMetricSearchRequestDTO;
 import com.example.back.dto.response.*;
-import com.example.back.dto.search.BaseSearchCriteria;
-import com.example.back.dto.search.DiskSearchCriteria;
-import com.example.back.dto.search.MetricTimeSearchCriteria;
-import com.example.back.dto.search.ServerSearchCriteria;
+import com.example.back.dto.search.*;
 import com.example.back.service.*;
 import com.example.back.util.ExtractCriteria;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,11 +25,12 @@ public class MetricController {
     private final NetworkConnectionService networkConnectionService;
     private final DiskService diskService;
     private final ServerService serverService;
+    private final DiskIOService diskIOService;
     private final ExtractCriteria extractCriteria;
 
 
     @Autowired
-    public MetricController(MetricService metricService, MemoryService memoryService, SwapService swapService, CPUService cpuService, NetworkConnectionService networkConnectionService, DiskService diskService, ServerService serverService, ExtractCriteria extractCriteria) {
+    public MetricController(MetricService metricService, MemoryService memoryService, SwapService swapService, CPUService cpuService, NetworkConnectionService networkConnectionService, DiskService diskService, ServerService serverService, DiskIOService diskIOService, ExtractCriteria extractCriteria) {
         this.metricService = metricService;
         this.memoryService = memoryService;
         this.swapService = swapService;
@@ -40,6 +38,7 @@ public class MetricController {
         this.networkConnectionService = networkConnectionService;
         this.diskService = diskService;
         this.serverService = serverService;
+        this.diskIOService = diskIOService;
         this.extractCriteria = extractCriteria;
     }
 
@@ -119,5 +118,14 @@ public class MetricController {
         Map<String, List<DiskResponseDTO>> disks = diskService.getDisksByCriteria(criteria);
 
         return ResponseEntity.status(HttpStatus.OK).body(disks);
+    }
+    @PostMapping("/disksIO")
+    public ResponseEntity<Map<String, List<DiskIoResponseDTO>>> getDisksIO(@RequestBody(required = false) DiskIOSearchCriteria criteria) {
+        if (criteria == null) {
+            criteria = new DiskIOSearchCriteria();
+        }
+        Map<String, List<DiskIoResponseDTO>> diskIo = diskIOService.getDiskIoByCriteria(criteria);
+
+        return ResponseEntity.status(HttpStatus.OK).body(diskIo);
     }
 }

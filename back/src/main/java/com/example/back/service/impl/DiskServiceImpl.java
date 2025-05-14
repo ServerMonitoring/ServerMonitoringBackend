@@ -29,7 +29,6 @@ public class DiskServiceImpl implements DiskService {
         Specification<Disk> diskSpecification = DiskSpecification.byCriteria(diskSearchCriteria);
         List<Disk> disks = diskRepository.findAll(diskSpecification);
 
-        //return disks.stream().map(DiskResponseDTO::toDTO).toList();
         return disks.stream()
                 .map(DiskResponseDTO::toDTO)
                 .collect(Collectors.groupingBy(DiskResponseDTO::getDevice));
