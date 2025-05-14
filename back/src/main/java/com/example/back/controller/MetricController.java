@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/metric")
@@ -111,11 +112,11 @@ public class MetricController {
     }
 
     @PostMapping("/disks")
-    public ResponseEntity<List<DiskResponseDTO>> getDisks(@RequestBody(required = false) DiskSearchCriteria criteria) {
+    public ResponseEntity<Map<String, List<DiskResponseDTO>>> getDisks(@RequestBody(required = false) DiskSearchCriteria criteria) {
         if (criteria == null) {
             criteria = new DiskSearchCriteria();
         }
-        List<DiskResponseDTO> disks = diskService.getDisksByCriteria(criteria);
+        Map<String, List<DiskResponseDTO>> disks = diskService.getDisksByCriteria(criteria);
 
         return ResponseEntity.status(HttpStatus.OK).body(disks);
     }

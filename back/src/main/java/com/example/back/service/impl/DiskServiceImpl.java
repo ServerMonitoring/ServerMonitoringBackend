@@ -11,6 +11,8 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class DiskServiceImpl implements DiskService {
@@ -23,10 +25,13 @@ public class DiskServiceImpl implements DiskService {
     }
 
     @Override
-    public List<DiskResponseDTO> getDisksByCriteria(DiskSearchCriteria diskSearchCriteria) {
+    public Map<String, List<DiskResponseDTO>> getDisksByCriteria(DiskSearchCriteria diskSearchCriteria) {
         Specification<Disk> diskSpecification = DiskSpecification.byCriteria(diskSearchCriteria);
         List<Disk> disks = diskRepository.findAll(diskSpecification);
 
-        return disks.stream().map(DiskResponseDTO::toDTO).toList();
+        //return disks.stream().map(DiskResponseDTO::toDTO).toList();
+        return disks.stream()
+                .map(DiskResponseDTO::toDTO)
+                .collect(Collectors.groupingBy(DiskResponseDTO::getDevice));
     }
 }
