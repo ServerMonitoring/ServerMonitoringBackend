@@ -5,15 +5,14 @@ import com.example.back.dto.response.*;
 import com.example.back.dto.search.BaseSearchCriteria;
 import com.example.back.dto.search.DiskSearchCriteria;
 import com.example.back.dto.search.MetricTimeSearchCriteria;
+import com.example.back.dto.search.ServerSearchCriteria;
 import com.example.back.service.*;
 import com.example.back.util.ExtractCriteria;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -27,17 +26,19 @@ public class MetricController {
     private final CPUService cpuService;
     private final NetworkConnectionService networkConnectionService;
     private final DiskService diskService;
+    private final ServerService serverService;
     private final ExtractCriteria extractCriteria;
 
 
     @Autowired
-    public MetricController(MetricService metricService, MemoryService memoryService, SwapService swapService, CPUService cpuService, NetworkConnectionService networkConnectionService, DiskService diskService, ExtractCriteria extractCriteria) {
+    public MetricController(MetricService metricService, MemoryService memoryService, SwapService swapService, CPUService cpuService, NetworkConnectionService networkConnectionService, DiskService diskService, ServerService serverService, ExtractCriteria extractCriteria) {
         this.metricService = metricService;
         this.memoryService = memoryService;
         this.swapService = swapService;
         this.cpuService = cpuService;
         this.networkConnectionService = networkConnectionService;
         this.diskService = diskService;
+        this.serverService = serverService;
         this.extractCriteria = extractCriteria;
     }
 
@@ -52,6 +53,21 @@ public class MetricController {
         List<MetricResponseDTO> metrics = metricService.getMetricsByCriteria(baseSearchCriteria, metricTimeSearchCriteria);
 
         return ResponseEntity.status(HttpStatus.OK).body(metrics);
+    }
+
+    @PostMapping("/static")
+    public ResponseEntity<List<StaticMetricServerResponseDTO>> getStaticMetricServer(@RequestBody(required = false) ServerSearchCriteria criteria, @RequestHeader(HttpHeaders.AUTHORIZATION) String token) {
+        if (!token.startsWith("Bearer ")) {
+            throw new IllegalArgumentException("Invalid authorization header");
+        }
+
+        if (criteria == null) {
+            criteria = new ServerSearchCriteria();
+        }
+        String userToken = token.substring("Bearer ".length());
+
+        List<StaticMetricServerResponseDTO> response = serverService.getStaticMetricServer(criteria, userToken);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @PostMapping("/memory")
