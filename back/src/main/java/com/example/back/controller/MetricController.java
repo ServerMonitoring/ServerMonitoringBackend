@@ -27,11 +27,12 @@ public class MetricController {
     private final ServerService serverService;
     private final DiskIOService diskIOService;
     private final GPUService gpuService;
+    private final NetInterfaceService netInterfaceService;
     private final ExtractCriteria extractCriteria;
 
 
     @Autowired
-    public MetricController(MetricService metricService, MemoryService memoryService, SwapService swapService, CPUService cpuService, NetworkConnectionService networkConnectionService, DiskService diskService, ServerService serverService, DiskIOService diskIOService, GPUService gpuService, ExtractCriteria extractCriteria) {
+    public MetricController(MetricService metricService, MemoryService memoryService, SwapService swapService, CPUService cpuService, NetworkConnectionService networkConnectionService, DiskService diskService, ServerService serverService, DiskIOService diskIOService, GPUService gpuService, NetInterfaceService netInterfaceService, ExtractCriteria extractCriteria) {
         this.metricService = metricService;
         this.memoryService = memoryService;
         this.swapService = swapService;
@@ -41,6 +42,7 @@ public class MetricController {
         this.serverService = serverService;
         this.diskIOService = diskIOService;
         this.gpuService = gpuService;
+        this.netInterfaceService = netInterfaceService;
         this.extractCriteria = extractCriteria;
     }
 
@@ -139,5 +141,15 @@ public class MetricController {
         Map<String, List<GPUResponseDTO>> GPUs = gpuService.getGPUsByCriteria(criteria);
 
         return ResponseEntity.status(HttpStatus.OK).body(GPUs);
+    }
+
+    @PostMapping("/net_interface")
+    public ResponseEntity<List<NetInterfaceResponseDTO>> getNetInterfaces(@RequestBody(required = false) BaseAndMetricSearchRequestDTO requestDTO) {
+        BaseSearchCriteria baseSearchCriteria = extractCriteria.extractBaseSearchCriteria(requestDTO);
+        MetricTimeSearchCriteria metricTimeSearchCriteria = extractCriteria.extractMetricTimeSearchCriteria(requestDTO);
+
+        List<NetInterfaceResponseDTO> netInterface = netInterfaceService.getNetInterfacesByCriteria(baseSearchCriteria, metricTimeSearchCriteria);
+
+        return ResponseEntity.status(HttpStatus.OK).body(netInterface);
     }
 }
