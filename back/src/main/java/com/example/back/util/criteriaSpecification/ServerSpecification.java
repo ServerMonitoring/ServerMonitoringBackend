@@ -18,22 +18,22 @@ public class ServerSpecification {
             if (criteria.getUserId() != null){
                 predicates.add(criteriaBuilder.equal(root.get("users").get("userId"), criteria.getUserId()));
             }
-            if (!criteria.getHostname().isBlank()){
+            if (criteria.getHostname() != null && !criteria.getHostname().isBlank()){
                 predicates.add(criteriaBuilder.like(root.get("hostname"), "%"+criteria.getHostname()+"%"));
             }
-            if (!criteria.getOsInfo().isBlank()){
+            if (criteria.getOsInfo() != null && !criteria.getOsInfo().isBlank()){
                 predicates.add(criteriaBuilder.like(root.get("osInfo"), "%"+criteria.getOsInfo()+"%"));
             }
-            if (!criteria.getAddress().isBlank()){
+            if (criteria.getAddress() != null && !criteria.getAddress().isBlank()){
                 predicates.add(criteriaBuilder.like(root.get("address"), "%"+criteria.getAddress()+"%"));
             }
-            if (!criteria.getAddInfo().isEmpty()){
+            if (criteria.getAddInfo() != null && !criteria.getAddInfo().isEmpty()){
                 predicates.add(criteriaBuilder.like(root.get("addInfo"), "%"+criteria.getAddInfo()+"%"));
             }
             if (criteria.getOnline() != null){
                 predicates.add(criteriaBuilder.equal(root.get("online"), criteria.getOnline()));
             }
-            if (!criteria.getCpuModel().isBlank()){
+            if (criteria.getCpuModel() != null && !criteria.getCpuModel().isBlank()){
                 predicates.add(criteriaBuilder.like(root.get("cpuModel"), "%"+criteria.getCpuModel()+"%"));
             }
             if (criteria.getCpuCountCores() != null){

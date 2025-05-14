@@ -1,14 +1,19 @@
 package com.example.back.service.impl;
 
 import com.example.back.dto.request.*;
+import com.example.back.dto.response.MetricResponseDTO;
+import com.example.back.dto.search.BaseSearchCriteria;
+import com.example.back.dto.search.MetricTimeSearchCriteria;
 import com.example.back.model.*;
 import com.example.back.repository.MetricRepository;
 import com.example.back.repository.ServerRepository;
 import com.example.back.service.*;
 import com.example.back.service.security.JwtService;
 import com.example.back.util.EntityUtils;
+import com.example.back.util.ExtractCriteria;
 import com.example.back.util.alert.AlertEvaluationService;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.back.util.criteriaSpecification.SimpleMetricSpecification;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,13 +27,23 @@ public class MetricServiceImpl implements MetricService {
     private final ServerRepository serverRepository;
     private final JwtService jwtService;
 
-    @Autowired
+
     public MetricServiceImpl(MetricRepository metricRepository, AlertEvaluationService alertEvaluationService, ServerRepository serverRepository, JwtService jwtService) {
         this.metricRepository = metricRepository;
         this.alertEvaluationService = alertEvaluationService;
         this.serverRepository = serverRepository;
         this.jwtService = jwtService;
+
     }
+
+
+    @Override
+    public List<MetricResponseDTO> getMetricsByCriteria(BaseSearchCriteria baseCriteria, MetricTimeSearchCriteria metricCriteria) {
+        Specification<Metric> metricSpecification = SimpleMetricSpecification.bySimpleCriteria(metricCriteria, baseCriteria);
+        List<Metric> metrics = metricRepository.findAll(metricSpecification);
+        return metrics.stream().map(MetricResponseDTO::toDTO).toList();
+    }
+
 
     @Override
     @Transactional
@@ -146,4 +161,6 @@ public class MetricServiceImpl implements MetricService {
         metricRepository.save(metric);
         alertEvaluationService.evaluateAndSaveAlerts(server,metricDTORequest,server.getUsers().getPreferredLanguage());
     }
+
+
 }

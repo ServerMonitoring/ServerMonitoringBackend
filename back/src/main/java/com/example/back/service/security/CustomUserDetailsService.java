@@ -2,7 +2,9 @@ package com.example.back.service.security;
 
 import com.example.back.config.security.components.CustomUserDetails;
 import com.example.back.dto.UserDto;
+import com.example.back.exception.UserNotFoundException;
 import com.example.back.model.Users;
+import com.example.back.repository.UserRepository;
 import com.example.back.service.UserService;
 
 import jakarta.transaction.Transactional;
@@ -19,13 +21,13 @@ import java.util.Optional;
 @Primary
 public class CustomUserDetailsService implements UserDetailsService {
     @Autowired
-    private UserService userService;
+    private UserRepository userRepository;
 
     @Override
     @Transactional
     public UserDetails loadUserByUsername(String login) throws UsernameNotFoundException {
-        Optional<Users> user = userService.findUserByLogin(login);
-        return getUser(user).map(CustomUserDetails::new).orElseThrow(() -> new UsernameNotFoundException(login + " " +
+        Users user = userRepository.findByLogin(login).orElseThrow(() -> new UserNotFoundException("User with login: "+login+" not found"));
+        return getUser(Optional.ofNullable(user)).map(CustomUserDetails::new).orElseThrow(() -> new UsernameNotFoundException(login + " " +
                 "not found."));
     }
 

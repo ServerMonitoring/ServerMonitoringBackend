@@ -3,8 +3,10 @@ package com.example.back.util.criteriaSpecification;
 import com.example.back.dto.search.BaseSearchCriteria;
 import com.example.back.dto.search.MetricTimeSearchCriteria;
 import com.example.back.model.Metric;
+import jakarta.persistence.criteria.From;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.util.ArrayList;
@@ -16,7 +18,15 @@ public class SimpleMetricSpecification {
                                                       MetricTimeSearchCriteria metricCriteria,
                                                       BaseSearchCriteria baseCriteria) {
         return (root, query, criteriaBuilder) -> {
-            Join<T, Metric> metricJoin = root.join("metric");
+
+            From<?, Metric> metricJoin;
+
+            if (root.getJavaType().equals(Metric.class)) {
+                metricJoin = (Root<Metric>) root;
+            } else {
+                metricJoin = root.join("metric");
+            }
+
 
             List<Predicate> predicates = new ArrayList<>();
 
