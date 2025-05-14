@@ -74,7 +74,12 @@ public class UserServiceImpl implements UserService {
         Optional.ofNullable(updateRequestDTO.getDepartment()).ifPresent(user::setDepartment);
         Optional.ofNullable(updateRequestDTO.getPosition()).ifPresent(user::setPosition);
         Optional.ofNullable(updateRequestDTO.getLogin()).ifPresent(user::setLogin);
-        Optional.ofNullable(updateRequestDTO.getPassword()).ifPresent(user::setPassword);
+        Optional.ofNullable(updateRequestDTO.getPassword())
+                .filter(password -> !password.trim().isEmpty())
+                .map(passwordEncoder::encode)
+                .ifPresentOrElse(user::setPassword, () -> {
+                    throw new PasswordIsMissingException("Password is required to register a user");
+                });
         Optional.ofNullable(updateRequestDTO.getPreferredLanguage()).ifPresent(user::setPreferredLanguage);
         Optional.ofNullable(updateRequestDTO.getAddInfo()).ifPresent(user::setAddInfo);
 
