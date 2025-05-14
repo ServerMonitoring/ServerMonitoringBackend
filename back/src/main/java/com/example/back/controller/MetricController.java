@@ -26,11 +26,12 @@ public class MetricController {
     private final DiskService diskService;
     private final ServerService serverService;
     private final DiskIOService diskIOService;
+    private final GPUService gpuService;
     private final ExtractCriteria extractCriteria;
 
 
     @Autowired
-    public MetricController(MetricService metricService, MemoryService memoryService, SwapService swapService, CPUService cpuService, NetworkConnectionService networkConnectionService, DiskService diskService, ServerService serverService, DiskIOService diskIOService, ExtractCriteria extractCriteria) {
+    public MetricController(MetricService metricService, MemoryService memoryService, SwapService swapService, CPUService cpuService, NetworkConnectionService networkConnectionService, DiskService diskService, ServerService serverService, DiskIOService diskIOService, GPUService gpuService, ExtractCriteria extractCriteria) {
         this.metricService = metricService;
         this.memoryService = memoryService;
         this.swapService = swapService;
@@ -39,6 +40,7 @@ public class MetricController {
         this.diskService = diskService;
         this.serverService = serverService;
         this.diskIOService = diskIOService;
+        this.gpuService = gpuService;
         this.extractCriteria = extractCriteria;
     }
 
@@ -127,5 +129,15 @@ public class MetricController {
         Map<String, List<DiskIoResponseDTO>> diskIo = diskIOService.getDiskIoByCriteria(criteria);
 
         return ResponseEntity.status(HttpStatus.OK).body(diskIo);
+    }
+
+    @PostMapping("/gpu")
+    public ResponseEntity<Map<String, List<GPUResponseDTO>>> getGPU(@RequestBody(required = false) GPUSearchCriteria criteria) {
+        if (criteria == null) {
+            criteria = new GPUSearchCriteria();
+        }
+        Map<String, List<GPUResponseDTO>> GPUs = gpuService.getGPUsByCriteria(criteria);
+
+        return ResponseEntity.status(HttpStatus.OK).body(GPUs);
     }
 }

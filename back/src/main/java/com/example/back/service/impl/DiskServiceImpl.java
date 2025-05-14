@@ -25,8 +25,8 @@ public class DiskServiceImpl implements DiskService {
     }
 
     @Override
-    public Map<String, List<DiskResponseDTO>> getDisksByCriteria(DiskSearchCriteria diskSearchCriteria) {
-        Specification<Disk> diskSpecification = DiskSpecification.byCriteria(diskSearchCriteria);
+    public Map<String, List<DiskResponseDTO>> getDisksByCriteria(DiskSearchCriteria searchCriteria) {
+        Specification<Disk> diskSpecification = DiskSpecification.byCriteria(searchCriteria);
         List<Disk> disks = diskRepository.findAll(diskSpecification);
 
         return disks.stream()
