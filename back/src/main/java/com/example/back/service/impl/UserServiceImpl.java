@@ -1,6 +1,9 @@
 package com.example.back.service.impl;
 
+import com.example.back.config.security.components.CustomUserDetails;
 import com.example.back.dto.request.AuthUserRequestDTO;
+import com.example.back.dto.request.UserUpdateRequestDTO;
+import com.example.back.dto.response.UserResponseDTO;
 import com.example.back.exception.LoginIsMissingException;
 import com.example.back.exception.PasswordIsMissingException;
 import com.example.back.exception.UserAlreadyExistsException;
@@ -9,6 +12,8 @@ import com.example.back.model.Users;
 import com.example.back.model.enums.Role;
 import com.example.back.repository.UserRepository;
 import com.example.back.service.UserService;
+import com.example.back.service.security.CustomUserDetailsService;
+import com.example.back.service.security.JwtService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -21,11 +26,15 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
+    private final CustomUserDetailsService customUserDetailsService;
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtService jwtService, CustomUserDetailsService customUserDetailsService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.jwtService = jwtService;
+        this.customUserDetailsService = customUserDetailsService;
     }
 
     @Override
@@ -45,12 +54,56 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public UserResponseDTO getUser(String token){
+        Long id = jwtService.extractId(token);
+        Users user = userRepository.findById(id).orElseThrow(()-> new UserNotFoundException("User not found"));
+        return UserResponseDTO.toDTO(user);
+    }
+
+    @Override
+    @Transactional
+    public UserResponseDTO updateUser(String token, UserUpdateRequestDTO updateRequestDTO){
+        Long id = jwtService.extractId(token);
+        Users user = userRepository.findById(id).orElseThrow(()-> new UserNotFoundException("User not found"));
+
+        boolean loginChanged = updateRequestDTO.getLogin() != null && !user.getLogin().equals(updateRequestDTO.getLogin());
+
+        Optional.ofNullable(updateRequestDTO.getName()).ifPresent(user::setName);
+        Optional.ofNullable(updateRequestDTO.getSurname()).ifPresent(user::setSurname);
+        Optional.ofNullable(updateRequestDTO.getPatronymic()).ifPresent(user::setPatronymic);
+        Optional.ofNullable(updateRequestDTO.getDepartment()).ifPresent(user::setDepartment);
+        Optional.ofNullable(updateRequestDTO.getPosition()).ifPresent(user::setPosition);
+        Optional.ofNullable(updateRequestDTO.getLogin()).ifPresent(user::setLogin);
+        Optional.ofNullable(updateRequestDTO.getPassword()).ifPresent(user::setPassword);
+        Optional.ofNullable(updateRequestDTO.getPreferredLanguage()).ifPresent(user::setPreferredLanguage);
+        Optional.ofNullable(updateRequestDTO.getAddInfo()).ifPresent(user::setAddInfo);
+
+        Users updatedUser = userRepository.save(user);
+        UserResponseDTO userResponseDTO = UserResponseDTO.toDTO(updatedUser);
+
+        String newToken = null;
+        if(loginChanged){
+            CustomUserDetails userDetails = (CustomUserDetails) customUserDetailsService.loadUserByUsername(user.getLogin());
+            newToken = jwtService.generateToken(userDetails);
+            userResponseDTO.setJwt(newToken);
+        }
+        return userResponseDTO;
+    }
+
+    @Override
+    public void deleteUser(String token){
+        Long id = jwtService.extractId(token);
+        userRepository.deleteById(id);
+    }
+
+    @Override
     @Transactional
     public Users registerUser(AuthUserRequestDTO requestDTO){
         Users user = new Users();
 
 
         Optional.ofNullable(requestDTO.getLogin()).ifPresentOrElse(user::setLogin, () -> {throw new LoginIsMissingException("Login is required to register a user");});
+        verifyUserExistenceByLogin(requestDTO.getLogin());
         Optional.ofNullable(requestDTO.getPassword())
                 .filter(password -> !password.trim().isEmpty())
                 .map(passwordEncoder::encode)

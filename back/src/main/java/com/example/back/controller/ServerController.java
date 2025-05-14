@@ -87,7 +87,7 @@ public class ServerController {
         serverService.deleteServer(serverId, userToken);
         return ResponseEntity.status(HttpStatus.OK).body("Deleted server with id " + serverId);
     }
-    
+
     @PostMapping("/token/refresh")
     public ResponseEntity<String> refreshNodeToken(@RequestHeader(HttpHeaders.AUTHORIZATION) String token, @RequestBody Long serverId ) {
         if (!token.startsWith("Bearer ")) {
