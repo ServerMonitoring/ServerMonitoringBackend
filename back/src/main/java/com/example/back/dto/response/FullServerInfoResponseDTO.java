@@ -10,6 +10,7 @@ import lombok.*;
 @Builder
 @ToString
 public class FullServerInfoResponseDTO {
+    private Long id;
     private String hostname;
     private String osInfo;
     private String address;
@@ -24,6 +25,7 @@ public class FullServerInfoResponseDTO {
 
     public static FullServerInfoResponseDTO toDTO(Server server){
         return FullServerInfoResponseDTO.builder()
+                .id(server.getServerId())
                 .hostname(server.getHostname())
                 .osInfo(server.getOsInfo())
                 .address(server.getAddress())
