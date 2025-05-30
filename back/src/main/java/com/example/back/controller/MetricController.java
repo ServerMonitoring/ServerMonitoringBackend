@@ -46,6 +46,8 @@ public class MetricController {
         this.extractCriteria = extractCriteria;
     }
 
+
+    //TODO добавить получение jwt для сверки что пользователь получил просит свой сервер + добавить что id сервера точно есть ? ДЛЯ ВСЕХ МЕТОДОВ
     @PostMapping()
     public ResponseEntity<List<MetricResponseDTO>> getMetric(@RequestBody(required = false) BaseAndMetricSearchRequestDTO requestDTO) {
         if (requestDTO == null) {
