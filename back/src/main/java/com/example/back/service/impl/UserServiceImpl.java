@@ -3,6 +3,7 @@ package com.example.back.service.impl;
 import com.example.back.config.security.components.CustomUserDetails;
 import com.example.back.dto.request.AuthUserRequestDTO;
 import com.example.back.dto.request.UserUpdateRequestDTO;
+import com.example.back.dto.response.UserForAdminResponseDTO;
 import com.example.back.dto.response.UserResponseDTO;
 import com.example.back.exception.LoginIsMissingException;
 import com.example.back.exception.PasswordIsMissingException;
@@ -19,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -99,6 +101,17 @@ public class UserServiceImpl implements UserService {
     public void deleteUser(String token){
         Long id = jwtService.extractId(token);
         userRepository.deleteById(id);
+    }
+
+    @Override
+    public void deleteUser(Long id){
+        userRepository.deleteById(id);
+    }
+
+    @Override
+    public List<UserForAdminResponseDTO> getAllUsersForAdmin(){
+        List<Users> users = userRepository.findAll();
+        return users.stream().map(UserForAdminResponseDTO::toDTO).toList();
     }
 
     @Override
