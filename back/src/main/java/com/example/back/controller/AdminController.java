@@ -21,6 +21,7 @@ public class AdminController {
         this.userService = userService;
     }
 
+    //TODO добавить фильтры для поиска пользователя
     @GetMapping
     public ResponseEntity<List<UserForAdminResponseDTO>> getAllUsers() {
 
@@ -34,4 +35,6 @@ public class AdminController {
         userService.deleteUser(userId);
         return ResponseEntity.status(HttpStatus.OK).body("User deleted successfully");
     }
+    //TODO сделать админу возможность обновить все данные пользователя в том числе и роль
+    //TODO сделать взаимодействие со всеми серверами всех пользователей?
 }

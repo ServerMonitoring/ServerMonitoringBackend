@@ -5,10 +5,7 @@ import com.example.back.dto.request.AuthUserRequestDTO;
 import com.example.back.dto.request.UserUpdateRequestDTO;
 import com.example.back.dto.response.UserForAdminResponseDTO;
 import com.example.back.dto.response.UserResponseDTO;
-import com.example.back.exception.LoginIsMissingException;
-import com.example.back.exception.PasswordIsMissingException;
-import com.example.back.exception.UserAlreadyExistsException;
-import com.example.back.exception.UserNotFoundException;
+import com.example.back.exception.*;
 import com.example.back.model.Users;
 import com.example.back.model.enums.Role;
 import com.example.back.repository.UserRepository;
@@ -16,6 +13,7 @@ import com.example.back.service.UserService;
 import com.example.back.service.security.CustomUserDetailsService;
 import com.example.back.service.security.JwtService;
 import jakarta.transaction.Transactional;
+import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -129,7 +127,8 @@ public class UserServiceImpl implements UserService {
                     throw new PasswordIsMissingException("Password is required to register a user");
                 });
 
-        user.setRole(requestDTO.getRole());
+
+        Optional.ofNullable(requestDTO.getRole()).ifPresentOrElse(user::setRole, () -> {throw new RequestArgumentException("Role is required to register a user");});
         user.setIsActive(true);
 
         Optional.ofNullable(requestDTO.getName()).ifPresent(user::setName);

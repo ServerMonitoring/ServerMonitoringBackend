@@ -2,6 +2,7 @@ package com.example.back.dto.response;
 
 import com.example.back.model.Users;
 import com.example.back.model.enums.PreferredLanguage;
+import com.example.back.model.enums.Role;
 import lombok.*;
 
 
@@ -20,6 +21,7 @@ public class UserResponseDTO {
     private String login;
     private String preferredLanguage;
     private String addInfo;
+    private Role role;
     private String jwt;
 
     public static UserResponseDTO toDTO(Users user) {
@@ -34,6 +36,7 @@ public class UserResponseDTO {
                         user.getPreferredLanguage() != null ? user.getPreferredLanguage().name() : null
                 )
                 .addInfo(user.getAddInfo())
+                .role(user.getRole())
                 .build();
     }
 }
