@@ -14,9 +14,11 @@ public class MinServerInfoResponseDTO {
     private String address;
     private String serverName;
     private String addInfo;
+    private Long idserver;
 
     public static MinServerInfoResponseDTO toDTO(Server server){
         return MinServerInfoResponseDTO.builder()
+                .idserver(server.getServerId())
                 .hostname(server.getHostname())
                 .address(server.getAddress())
                 .serverName(server.getServerName())
