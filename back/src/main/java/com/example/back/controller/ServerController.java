@@ -79,7 +79,7 @@ public class ServerController {
     }
 
     @DeleteMapping("/delete")
-    public ResponseEntity<String> deleteServer(@RequestHeader(HttpHeaders.AUTHORIZATION) String token,@RequestBody Long serverId) {
+    public ResponseEntity<String> deleteServer(@RequestHeader(HttpHeaders.AUTHORIZATION) String token,@RequestParam(name = "serverId") Long serverId) {
         if (!token.startsWith("Bearer ")) {
             throw new IllegalArgumentException("Invalid authorization header");
         }
