@@ -83,7 +83,7 @@ public class WebSecurityConfig {
                         .requestMatchers("/auth/**").permitAll()
 
                         .requestMatchers("/api/node/**").hasAuthority(Role.NODE.name())
-
+                        .requestMatchers("/api/admin/**").hasAuthority(Role.ADMIN.name())
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
