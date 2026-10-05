@@ -3,6 +3,8 @@ package com.example.back.dto.response;
 import com.example.back.model.Memory;
 import lombok.*;
 
+import java.time.Instant;
+
 @Setter
 @Getter
 @NoArgsConstructor
@@ -16,6 +18,7 @@ public class MemoryResponseDTO {
     private Long memoryFree;
     private Long memoryCached;
     private Double memoryUsedPercent;
+    private Instant timestamp;
 
     public static MemoryResponseDTO toDTO(Memory memory) {
         return MemoryResponseDTO.builder()
@@ -25,6 +28,7 @@ public class MemoryResponseDTO {
                 .memoryFree(memory.getMemoryFree())
                 .memoryCached(memory.getMemoryCached())
                 .memoryUsedPercent(memory.getMemoryUsedPercent())
+                .timestamp(memory.getMetric().getTimestamp())
                 .build();
     }
 }

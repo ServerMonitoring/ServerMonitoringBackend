@@ -30,8 +30,9 @@ public class UserController {
         UserResponseDTO userResponseDTO = userService.getUser(userToken);
         return ResponseEntity.status(HttpStatus.OK).body(userResponseDTO);
     }
-    @PostMapping
-    public ResponseEntity<UserResponseDTO> updateUser(@RequestHeader(HttpHeaders.AUTHORIZATION) String token,@RequestBody UserUpdateRequestDTO requestDTO){
+    @PutMapping
+    public ResponseEntity<UserResponseDTO> updateUser(@RequestHeader(HttpHeaders.AUTHORIZATION) String token,
+                                                      @RequestBody UserUpdateRequestDTO requestDTO){
         if (!token.startsWith("Bearer ")) {
             throw new IllegalArgumentException("Invalid authorization header");
         }

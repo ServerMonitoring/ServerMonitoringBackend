@@ -78,6 +78,10 @@ public class MetricController {
 
     @PostMapping("/memory")
     public ResponseEntity<List<MemoryResponseDTO>> getMemory(@RequestBody(required = false) BaseAndMetricSearchRequestDTO requestDTO) {
+        System.out.println("Start time");
+        System.out.println(requestDTO.getMetricTimeCriteria().getStartTime());
+        System.out.println("End time");
+        System.out.println(requestDTO.getMetricTimeCriteria().getEndTime());
         BaseSearchCriteria baseSearchCriteria = extractCriteria.extractBaseSearchCriteria(requestDTO);
         MetricTimeSearchCriteria metricTimeSearchCriteria = extractCriteria.extractMetricTimeSearchCriteria(requestDTO);
 

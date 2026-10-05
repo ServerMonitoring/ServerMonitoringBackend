@@ -1,0 +1,38 @@
+services:
+  postgres-master:
+    image: bitnami/postgresql:latest
+    container_name: postgres-master
+    environment:
+      - POSTGRESQL_REPLICATION_MODE=master
+      - POSTGRESQL_REPLICATION_USER=repl_user
+      - POSTGRESQL_REPLICATION_PASSWORD=repl_pass
+      - POSTGRESQL_USERNAME=admin
+      - POSTGRESQL_PASSWORD=Diplom2025
+      - POSTGRESQL_DATABASE=DB
+    ports:
+      - "5432:5432"
+    volumes:
+      - master_data:/bitnami/postgresql
+
+  postgres-slave:
+    image: bitnami/postgresql:latest
+    container_name: postgres-slave
+    depends_on:
+      - postgres-master
+    environment:
+      - POSTGRESQL_REPLICATION_MODE=slave
+      - POSTGRESQL_REPLICATION_USER=repl_user
+      - POSTGRESQL_REPLICATION_PASSWORD=repl_pass
+      - POSTGRESQL_MASTER_HOST=postgres-master
+      - POSTGRESQL_USERNAME=admin
+      - POSTGRESQL_PASSWORD=Diplom2025
+      - POSTGRESQL_DATABASE=DB
+    ports:
+      - "5433:5432"
+    volumes:
+      - slave_data:/bitnami/postgresql
+
+volumes:
+  master_data:
+  slave_data:
+#docker exec -it postgres-slave psql -U admin -d DB
