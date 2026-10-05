@@ -27,6 +27,7 @@ public class Server {
     private Boolean online;
     @Column(name = "last_seen_at")
     private Instant lastSeenAt;
+    private Integer nodeTokenVersion = 0;
     private String cpuModel;
     private Integer cpuCountCores;
     private Integer cpuCountCoresPhysical;

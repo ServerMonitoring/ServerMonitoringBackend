@@ -1,6 +1,8 @@
 package com.example.back.service.impl;
 
 import com.example.back.dto.request.*;
+import com.example.back.exception.RequestArgumentException;
+import com.example.back.exception.AuthenticationFailedException;
 import com.example.back.dto.response.MetricResponseDTO;
 import com.example.back.dto.search.BaseSearchCriteria;
 import com.example.back.dto.search.MetricTimeSearchCriteria;
@@ -52,6 +54,7 @@ public class MetricServiceImpl implements MetricService {
         Long serverId = jwtService.extractServerId(nodeToken);
         Server server = serverRepository.findById(serverId)
                 .orElseThrow(() -> new RuntimeException("Server not found"));
+        assertCurrentNodeToken(nodeToken, server);
 
         EntityUtils.updateIfChanged(server::getHostname, server::setHostname, dtoRequest.getHostname());
         EntityUtils.updateIfChanged(server::getOsInfo, server::setOsInfo, dtoRequest.getOs());
@@ -69,11 +72,29 @@ public class MetricServiceImpl implements MetricService {
     @Override
     @Transactional
     public void saveMetrics(String nodeToken, MetricDTORequest metricDTORequest) {
+        if (metricDTORequest == null || metricDTORequest.getTimestamp() == null) {
+            throw new RequestArgumentException("Metric payload and timestamp are required");
+        }
         Long serverId = jwtService.extractServerId(nodeToken);
         Server server = serverRepository.findById(serverId)
                 .orElseThrow(() -> new RuntimeException("Server not found"));
+        assertCurrentNodeToken(nodeToken, server);
+
+        if (metricDTORequest.getEventId() != null && !metricDTORequest.getEventId().isBlank()) {
+            var existingMetric = metricRepository.findByEventId(metricDTORequest.getEventId());
+            if (existingMetric.isPresent()) {
+                if (!serverId.equals(existingMetric.get().getServer().getServerId())) {
+                    throw new RequestArgumentException("Metric event ID is already used by another server");
+                }
+                server.setLastSeenAt(Instant.now());
+                server.setOnline(true);
+                serverRepository.save(server);
+                return;
+            }
+        }
 
         Metric metric = new Metric();
+        metric.setEventId(metricDTORequest.getEventId());
         metric.setTimestamp(metricDTORequest.getTimestamp());
         metric.setUptime(metricDTORequest.getUptime());
         metric.setNetSent(metricDTORequest.getNetSent());
@@ -98,33 +119,40 @@ public class MetricServiceImpl implements MetricService {
             metric.addDisk(DiskDTORequest.toModel(dto));
         }*/
         // Устанавливаем дочерние объекты в родителя
-        Memory memory = MemoryDTORequest.toModel(metricDTORequest.getMemory());
-        memory.setMetric(metric);
-        metric.setMemory(memory);
+        if (metricDTORequest.getMemory() != null) {
+            Memory memory = MemoryDTORequest.toModel(metricDTORequest.getMemory());
+            memory.setMetric(metric);
+            metric.setMemory(memory);
+        }
 
-        Swap swap = SwapDTORequest.toModel(metricDTORequest.getSwap());
-        swap.setMetric(metric);
-        metric.setSwap(swap);
+        if (metricDTORequest.getSwap() != null) {
+            Swap swap = SwapDTORequest.toModel(metricDTORequest.getSwap());
+            swap.setMetric(metric);
+            metric.setSwap(swap);
+        }
 
+        if (metricDTORequest.getCpu() != null) {
+            CPU cpu = CPUDTORequest.toModel(metricDTORequest.getCpu());
+            cpu.setMetric(metric);
+            List<Core> cores = safeList(metricDTORequest.getCpu().getCores()).stream()
+                    .filter(java.util.Objects::nonNull)
+                    .map(dto -> {
+                        Core core = CoresDTORequest.toModel(dto);
+                        core.setCpu(cpu);
+                        return core;
+                    }).toList();
+            cpu.setCores(cores);
+            metric.setCpu(cpu);
+        }
 
+        if (metricDTORequest.getNetworkConnection() != null) {
+            NetworkConnection networkConnection = NetworkConnectionDTORequest.toModel(metricDTORequest.getNetworkConnection());
+            networkConnection.setMetric(metric);
+            metric.setNetworkConnection(networkConnection);
+        }
 
-        CPU cpu = CPUDTORequest.toModel(metricDTORequest.getCpu());
-        cpu.setMetric(metric);
-
-        List<Core> cores = metricDTORequest.getCpu().getCores().stream()
-                .map(dto ->{
-                    Core core = CoresDTORequest.toModel(dto);
-                    core.setCpu(cpu);
-                    return core;
-                }).toList();
-        cpu.setCores(cores);
-        metric.setCpu(cpu);
-
-        NetworkConnection networkConnection = NetworkConnectionDTORequest.toModel(metricDTORequest.getNetworkConnection());
-        networkConnection.setMetric(metric);
-        metric.setNetworkConnection(networkConnection);
-
-        List<Disk> disks = metricDTORequest.getDisks().stream()
+        List<Disk> disks = safeList(metricDTORequest.getDisks()).stream()
+                .filter(java.util.Objects::nonNull)
                 .map(dto -> {
                     Disk disk = DiskDTORequest.toModel(dto);
                     disk.setMetric(metric);
@@ -132,7 +160,8 @@ public class MetricServiceImpl implements MetricService {
                 }).toList();
         metric.setDisks(disks);
 
-        List<DiskIO> diskIOs = metricDTORequest.getDiskIo().entrySet().stream()
+        List<DiskIO> diskIOs = (metricDTORequest.getDiskIo() == null ? java.util.Map.<String, DiskIODTORequest>of() : metricDTORequest.getDiskIo()).entrySet().stream()
+                .filter(entry -> entry.getKey() != null && entry.getValue() != null)
                 .map(entry -> {
                     DiskIO diskIO = DiskIODTORequest.toModel(entry.getKey(), entry.getValue());
                     diskIO.setMetric(metric);
@@ -140,7 +169,8 @@ public class MetricServiceImpl implements MetricService {
                 }).toList();
         metric.setDiskIo(diskIOs);
 
-        List<GPU> gpus = metricDTORequest.getGpu().stream()
+        List<GPU> gpus = safeList(metricDTORequest.getGpu()).stream()
+                .filter(java.util.Objects::nonNull)
                 .map(dto -> {
                     GPU gpu = GPUDTORequest.toModel(dto);
                     gpu.setMetric(metric);
@@ -148,7 +178,8 @@ public class MetricServiceImpl implements MetricService {
                 }).toList();
         metric.setGpu(gpus);
 
-        List<NetInterface> netInterfaces = metricDTORequest.getNetInterfaces().stream()
+        List<NetInterface> netInterfaces = safeList(metricDTORequest.getNetInterfaces()).stream()
+                .filter(java.util.Objects::nonNull)
                 .map(dto -> {
                     NetInterface netInterface = NetInterfaceDTORequest.toModel(dto);
                     netInterface.setMetric(metric);
@@ -163,6 +194,17 @@ public class MetricServiceImpl implements MetricService {
         server.setLastSeenAt(Instant.now());
         server.setOnline(true);
         serverRepository.save(server);
+    }
+
+    private static <T> List<T> safeList(List<T> values) {
+        return values == null ? List.of() : values;
+    }
+
+    private void assertCurrentNodeToken(String token, Server server) {
+        int currentVersion = server.getNodeTokenVersion() == null ? 0 : server.getNodeTokenVersion();
+        if (!Integer.valueOf(currentVersion).equals(jwtService.extractNodeTokenVersion(token))) {
+            throw new AuthenticationFailedException("Node token has been revoked; issue a new token");
+        }
     }
 
 

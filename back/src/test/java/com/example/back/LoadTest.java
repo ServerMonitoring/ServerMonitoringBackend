@@ -12,7 +12,7 @@ public class LoadTest {
     private static final int NODES = 100;
     private static final int INTERVAL_MS = 30_000; // 30 секунд
     private static final String ENDPOINT = "http://localhost:8080/api/node/changeable";
-    private static final String JWT = "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiTk9ERSIsInNlcnZlcklkIjoxLCJ1c2VySWQiOjEsInN1YiI6IjEiLCJpYXQiOjE3NjAxNjQ2NTd9.NUaTgiROt7OQl7mXMV8HcIV6zXLNPgK68L0oIa8IiGs";
+    private static final String JWT = System.getenv("NODE_TOKEN");
 
     private static final String JSON = """
             {
@@ -186,6 +186,9 @@ public class LoadTest {
     """;
 
     public static void main(String[] args) {
+        if (JWT == null || JWT.isBlank()) {
+            throw new IllegalStateException("Set NODE_TOKEN to run this manual load tool");
+        }
         ExecutorService executor = Executors.newFixedThreadPool(NODES);
 
         for (int i = 0; i < NODES; i++) {

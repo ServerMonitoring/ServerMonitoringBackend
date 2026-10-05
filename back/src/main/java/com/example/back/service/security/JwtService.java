@@ -66,6 +66,13 @@ public class JwtService {
         return extractClaim(token, claims -> claims.get("serverId", Long.class));
     }
 
+    public Integer extractNodeTokenVersion(String token) {
+        return extractClaim(token, claims -> {
+            Integer version = claims.get("tokenVersion", Integer.class);
+            return version == null ? 0 : version;
+        });
+    }
+
     /**
      * Извлечение всех данных JwtData из токена
      *
@@ -111,13 +118,15 @@ public class JwtService {
      * Генерация токена для ноды
      *
      * @param serverId id сервера
-     * @param userId id юзера
+     * @param userId id пользователя
+     * @param tokenVersion версия токена ноды
      * @return токен
      */
-    public String generateNodeToken(Long serverId, Long userId) {
+    public String generateNodeToken(Long serverId, Long userId, Integer tokenVersion) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("serverId", serverId);
         claims.put("userId", userId);
+        claims.put("tokenVersion", tokenVersion == null ? 0 : tokenVersion);
         claims.put("role", "NODE");
         return Jwts.builder()
                 .claims(claims)

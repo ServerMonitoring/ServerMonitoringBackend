@@ -98,12 +98,41 @@ public class UserServiceImpl implements UserService {
     @Override
     public void deleteUser(String token){
         Long id = jwtService.extractId(token);
-        userRepository.deleteById(id);
+        Users user = userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
+        ensureAdminCanBeRemoved(user);
+        userRepository.delete(user);
     }
 
     @Override
     public void deleteUser(Long id){
-        userRepository.deleteById(id);
+        Users user = userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
+        ensureAdminCanBeRemoved(user);
+        userRepository.delete(user);
+    }
+
+    @Override
+    @Transactional
+    public UserForAdminResponseDTO updateUserRole(Long id, Role role) {
+        if (role == null || role == Role.NODE) {
+            throw new RequestArgumentException("Only USER or ADMIN role can be assigned to a user");
+        }
+
+        Users user = userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
+        if (user.getRole() == Role.ADMIN && role != Role.ADMIN) {
+            ensureAdminCanBeRemoved(user);
+        }
+
+        user.setRole(role);
+        return UserForAdminResponseDTO.toDTO(userRepository.save(user));
+    }
+
+    private void ensureAdminCanBeRemoved(Users user) {
+        if (user.getRole() == Role.ADMIN && userRepository.countByRole(Role.ADMIN) <= 1) {
+            throw new RequestArgumentException("The last administrator cannot be demoted or deleted");
+        }
     }
 
     @Override
@@ -128,7 +157,8 @@ public class UserServiceImpl implements UserService {
                 });
 
 
-        Optional.ofNullable(requestDTO.getRole()).ifPresentOrElse(user::setRole, () -> {throw new RequestArgumentException("Role is required to register a user");});
+        // Public registration must never be able to choose a privileged role.
+        user.setRole(Role.USER);
         user.setIsActive(true);
 
         Optional.ofNullable(requestDTO.getName()).ifPresent(user::setName);
@@ -143,14 +173,14 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public void createAdmin() {
-        String defaultLogin = "admin";
-        String defaultPassword = "admin";
-
+    public void createAdmin(String login, String password) {
+        if (login == null || login.isBlank() || password == null || password.isBlank()) {
+            return;
+        }
         if (!userRepository.existsByRole(Role.ADMIN)) {
             Users admin = new Users();
-            admin.setLogin(defaultLogin);
-            admin.setPassword(passwordEncoder.encode(defaultPassword));
+            admin.setLogin(login.trim());
+            admin.setPassword(passwordEncoder.encode(password));
             admin.setRole(Role.ADMIN);
             admin.setIsActive(true);
             userRepository.save(admin);

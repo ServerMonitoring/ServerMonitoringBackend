@@ -2,6 +2,7 @@ package com.example.back.controller;
 
 
 import com.example.back.dto.response.UserForAdminResponseDTO;
+import com.example.back.dto.request.RoleUpdateRequestDTO;
 import com.example.back.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -34,6 +35,14 @@ public class AdminController {
     public ResponseEntity<String> deleteUser(@RequestParam(name = "userId") Long userId) {
         userService.deleteUser(userId);
         return ResponseEntity.status(HttpStatus.OK).body("User deleted successfully");
+    }
+
+    @PutMapping("/{userId}/role")
+    public ResponseEntity<UserForAdminResponseDTO> updateUserRole(
+            @PathVariable Long userId,
+            @RequestBody RoleUpdateRequestDTO request
+    ) {
+        return ResponseEntity.ok(userService.updateUserRole(userId, request.getRole()));
     }
     //TODO сделать админу возможность обновить все данные пользователя в том числе и роль
     //TODO сделать взаимодействие со всеми серверами всех пользователей?

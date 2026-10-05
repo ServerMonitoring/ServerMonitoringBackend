@@ -18,17 +18,17 @@ public class MetricExtractorsRegistry {
 
         extractors.put(MetricKey.CPU_TOTAL_LOAD, metric ->
                 Optional.ofNullable(metric.getCpu())
-                        .map(cpu -> List.of(cpu.getCpuPercentTotalLoad()))
+                        .map(cpu -> singleValue(cpu.getCpuPercentTotalLoad()))
                         .orElse(List.of()));
 
         extractors.put(MetricKey.MEMORY_PERCENT, metric ->
                 Optional.ofNullable(metric.getMemory())
-                        .map(mem -> List.of(mem.getMemoryUsedPercent()))
+                        .map(mem -> singleValue(mem.getMemoryUsedPercent()))
                         .orElse(List.of()));
 
         extractors.put(MetricKey.SWAP_PERCENT, metric ->
                 Optional.ofNullable(metric.getSwap())
-                        .map(swap -> List.of(swap.getSwapPercentUsed()))
+                        .map(swap -> singleValue(swap.getSwapPercentUsed()))
                         .orElse(List.of()));
 
         extractors.put(MetricKey.DISK_USED_PERCENT, metric ->
@@ -54,8 +54,13 @@ public class MetricExtractorsRegistry {
     }
 
     public List<Double> extractValues(MetricKey key, MetricDTORequest metric) {
+        if (metric == null) return List.of();
         return Optional.ofNullable(extractors.get(key))
                 .map(extractor -> extractor.extract(metric))
                 .orElse(List.of());
+    }
+
+    private static List<Double> singleValue(Double value) {
+        return value == null ? List.of() : List.of(value);
     }
 }

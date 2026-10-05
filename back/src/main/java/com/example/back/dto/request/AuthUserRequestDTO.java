@@ -1,6 +1,5 @@
 package com.example.back.dto.request;
 
-import com.example.back.model.enums.Role;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
@@ -18,6 +17,5 @@ public class AuthUserRequestDTO {
     private String position;
     private String login;
     private String password;
-    private Role role;
     private String addInfo;
 }

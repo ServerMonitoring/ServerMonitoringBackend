@@ -20,6 +20,8 @@ public class Metric {
     private Server server;
 
     private Instant timestamp;
+    @Column(unique = true)
+    private String eventId;
     private Long uptime;
     private Double netSent;
     private Double netRecv;

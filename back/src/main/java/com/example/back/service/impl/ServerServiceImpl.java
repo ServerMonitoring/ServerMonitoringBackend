@@ -8,6 +8,7 @@ import com.example.back.dto.response.StaticMetricServerResponseDTO;
 import com.example.back.dto.search.ServerSearchCriteria;
 import com.example.back.exception.ResourceAccessDeniedException;
 import com.example.back.exception.UserNotFoundException;
+import com.example.back.exception.RequestArgumentException;
 import com.example.back.model.Server;
 import com.example.back.model.Users;
 import com.example.back.model.enums.Role;
@@ -18,6 +19,7 @@ import com.example.back.service.security.JwtService;
 import com.example.back.util.criteriaSpecification.ServerSpecification;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -50,10 +52,11 @@ public class ServerServiceImpl implements ServerService {
 
         Server savedServer = serverRepository.save(server);
 
-        return jwtService.generateNodeToken(savedServer.getServerId(),id);
+        return jwtService.generateNodeToken(savedServer.getServerId(), id, savedServer.getNodeTokenVersion());
     }
 
     @Override
+    @Transactional
     public String updateNodeToken(Long serverId, String token){
         Users user = getUser(token);
         Server server = serverRepository.findById(serverId).orElseThrow(()-> new UserNotFoundException("Server not found"));
@@ -62,8 +65,15 @@ public class ServerServiceImpl implements ServerService {
             throw new ResourceAccessDeniedException("You do not have access to this server");
         }
 
-        // The node token must identify the owner of the server even when an admin refreshes it.
-        return jwtService.generateNodeToken(server.getServerId(), server.getUsers().getUserId());
+        int currentVersion = server.getNodeTokenVersion() == null ? 0 : server.getNodeTokenVersion();
+        if (currentVersion == Integer.MAX_VALUE) {
+            throw new RequestArgumentException("Node token version limit reached; contact support");
+        }
+        server.setNodeTokenVersion(currentVersion + 1);
+        serverRepository.save(server);
+
+        // Keep the token bound to the server owner even when an admin rotates it.
+        return jwtService.generateNodeToken(server.getServerId(), server.getUsers().getUserId(), server.getNodeTokenVersion());
     }
 
     @Override

@@ -6,6 +6,7 @@ import com.example.back.dto.request.UserUpdateRequestDTO;
 import com.example.back.dto.response.UserForAdminResponseDTO;
 import com.example.back.dto.response.UserResponseDTO;
 import com.example.back.model.Users;
+import com.example.back.model.enums.Role;
 import jakarta.transaction.Transactional;
 
 import java.util.List;
@@ -24,11 +25,13 @@ public interface UserService {
 
     void deleteUser(Long id);
 
+    UserForAdminResponseDTO updateUserRole(Long id, Role role);
+
     List<UserForAdminResponseDTO> getAllUsersForAdmin();
 
     @Transactional
     Users registerUser(AuthUserRequestDTO requestDTO);
 
     @Transactional
-    void createAdmin();
+    void createAdmin(String login, String password);
 }

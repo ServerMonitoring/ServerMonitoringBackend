@@ -14,6 +14,8 @@ import lombok.*;
 @Builder
 @ToString
 public class MetricDTORequest {
+    @JsonProperty("event_id")
+    private String eventId;
     private Instant timestamp;
     private Long uptime;
     private Double netSent;
