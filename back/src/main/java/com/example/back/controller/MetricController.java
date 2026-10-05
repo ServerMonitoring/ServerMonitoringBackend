@@ -29,10 +29,11 @@ public class MetricController {
     private final GPUService gpuService;
     private final NetInterfaceService netInterfaceService;
     private final ExtractCriteria extractCriteria;
+    private final MetricAccessService metricAccessService;
 
 
     @Autowired
-    public MetricController(MetricService metricService, MemoryService memoryService, SwapService swapService, CPUService cpuService, NetworkConnectionService networkConnectionService, DiskService diskService, ServerService serverService, DiskIOService diskIOService, GPUService gpuService, NetInterfaceService netInterfaceService, ExtractCriteria extractCriteria) {
+    public MetricController(MetricService metricService, MemoryService memoryService, SwapService swapService, CPUService cpuService, NetworkConnectionService networkConnectionService, DiskService diskService, ServerService serverService, DiskIOService diskIOService, GPUService gpuService, NetInterfaceService netInterfaceService, ExtractCriteria extractCriteria, MetricAccessService metricAccessService) {
         this.metricService = metricService;
         this.memoryService = memoryService;
         this.swapService = swapService;
@@ -44,10 +45,10 @@ public class MetricController {
         this.gpuService = gpuService;
         this.netInterfaceService = netInterfaceService;
         this.extractCriteria = extractCriteria;
+        this.metricAccessService = metricAccessService;
     }
 
 
-    //TODO добавить получение jwt для сверки что пользователь получил просит свой сервер + добавить что id сервера точно есть ? ДЛЯ ВСЕХ МЕТОДОВ
     @PostMapping()
     public ResponseEntity<List<MetricResponseDTO>> getMetric(@RequestBody(required = false) BaseAndMetricSearchRequestDTO requestDTO) {
         if (requestDTO == null) {
@@ -55,6 +56,8 @@ public class MetricController {
         }
         BaseSearchCriteria baseSearchCriteria = extractCriteria.extractBaseSearchCriteria(requestDTO);
         MetricTimeSearchCriteria metricTimeSearchCriteria = extractCriteria.extractMetricTimeSearchCriteria(requestDTO);
+        metricAccessService.assertCanReadServer(metricTimeSearchCriteria.getServerID());
+        metricAccessService.assertCanReadMetric(metricTimeSearchCriteria.getMetricId());
 
         List<MetricResponseDTO> metrics = metricService.getMetricsByCriteria(baseSearchCriteria, metricTimeSearchCriteria);
 
@@ -78,12 +81,10 @@ public class MetricController {
 
     @PostMapping("/memory")
     public ResponseEntity<List<MemoryResponseDTO>> getMemory(@RequestBody(required = false) BaseAndMetricSearchRequestDTO requestDTO) {
-        System.out.println("Start time");
-        System.out.println(requestDTO.getMetricTimeCriteria().getStartTime());
-        System.out.println("End time");
-        System.out.println(requestDTO.getMetricTimeCriteria().getEndTime());
         BaseSearchCriteria baseSearchCriteria = extractCriteria.extractBaseSearchCriteria(requestDTO);
         MetricTimeSearchCriteria metricTimeSearchCriteria = extractCriteria.extractMetricTimeSearchCriteria(requestDTO);
+        metricAccessService.assertCanReadServer(metricTimeSearchCriteria.getServerID());
+        metricAccessService.assertCanReadMetric(metricTimeSearchCriteria.getMetricId());
 
         List<MemoryResponseDTO> memory = memoryService.getMemoryByCriteria(baseSearchCriteria, metricTimeSearchCriteria);
 
@@ -94,6 +95,8 @@ public class MetricController {
     public ResponseEntity<List<SwapResponseDTO>> getSwap(@RequestBody(required = false) BaseAndMetricSearchRequestDTO requestDTO) {
         BaseSearchCriteria baseSearchCriteria = extractCriteria.extractBaseSearchCriteria(requestDTO);
         MetricTimeSearchCriteria metricTimeSearchCriteria = extractCriteria.extractMetricTimeSearchCriteria(requestDTO);
+        metricAccessService.assertCanReadServer(metricTimeSearchCriteria.getServerID());
+        metricAccessService.assertCanReadMetric(metricTimeSearchCriteria.getMetricId());
 
         List<SwapResponseDTO> swaps = swapService.getSwapByCriteria(baseSearchCriteria, metricTimeSearchCriteria);
 
@@ -104,6 +107,8 @@ public class MetricController {
     public ResponseEntity<List<CPUResponseDTO>> getCPU(@RequestBody(required = false) BaseAndMetricSearchRequestDTO requestDTO) {
         BaseSearchCriteria baseSearchCriteria = extractCriteria.extractBaseSearchCriteria(requestDTO);
         MetricTimeSearchCriteria metricTimeSearchCriteria = extractCriteria.extractMetricTimeSearchCriteria(requestDTO);
+        metricAccessService.assertCanReadServer(metricTimeSearchCriteria.getServerID());
+        metricAccessService.assertCanReadMetric(metricTimeSearchCriteria.getMetricId());
 
         List<CPUResponseDTO> cpus = cpuService.getCPUByCriteria(baseSearchCriteria, metricTimeSearchCriteria);
 
@@ -114,6 +119,8 @@ public class MetricController {
     public ResponseEntity<List<NetworkConnectionResponseDTO>> getNetworkConnections(@RequestBody(required = false) BaseAndMetricSearchRequestDTO requestDTO) {
         BaseSearchCriteria baseSearchCriteria = extractCriteria.extractBaseSearchCriteria(requestDTO);
         MetricTimeSearchCriteria metricTimeSearchCriteria = extractCriteria.extractMetricTimeSearchCriteria(requestDTO);
+        metricAccessService.assertCanReadServer(metricTimeSearchCriteria.getServerID());
+        metricAccessService.assertCanReadMetric(metricTimeSearchCriteria.getMetricId());
 
         List<NetworkConnectionResponseDTO> networkConnections = networkConnectionService.getNetworkConnectionsByCriteria(baseSearchCriteria, metricTimeSearchCriteria);
 
@@ -125,6 +132,9 @@ public class MetricController {
         if (criteria == null) {
             criteria = new DiskSearchCriteria();
         }
+        criteria.setMetricTimeCriteria(extractCriteria.applyDefaultTimeWindow(criteria.getMetricTimeCriteria()));
+        metricAccessService.assertCanReadServer(criteria.getMetricTimeCriteria().getServerID());
+        metricAccessService.assertCanReadMetric(criteria.getMetricTimeCriteria().getMetricId());
         Map<String, List<DiskResponseDTO>> disks = diskService.getDisksByCriteria(criteria);
 
         return ResponseEntity.status(HttpStatus.OK).body(disks);
@@ -134,6 +144,9 @@ public class MetricController {
         if (criteria == null) {
             criteria = new DiskIOSearchCriteria();
         }
+        criteria.setMetricTimeCriteria(extractCriteria.applyDefaultTimeWindow(criteria.getMetricTimeCriteria()));
+        metricAccessService.assertCanReadServer(criteria.getMetricTimeCriteria().getServerID());
+        metricAccessService.assertCanReadMetric(criteria.getMetricTimeCriteria().getMetricId());
         Map<String, List<DiskIoResponseDTO>> diskIo = diskIOService.getDiskIoByCriteria(criteria);
 
         return ResponseEntity.status(HttpStatus.OK).body(diskIo);
@@ -144,6 +157,9 @@ public class MetricController {
         if (criteria == null) {
             criteria = new GPUSearchCriteria();
         }
+        criteria.setMetricTimeCriteria(extractCriteria.applyDefaultTimeWindow(criteria.getMetricTimeCriteria()));
+        metricAccessService.assertCanReadServer(criteria.getMetricTimeCriteria().getServerID());
+        metricAccessService.assertCanReadMetric(criteria.getMetricTimeCriteria().getMetricId());
         Map<String, List<GPUResponseDTO>> GPUs = gpuService.getGPUsByCriteria(criteria);
 
         return ResponseEntity.status(HttpStatus.OK).body(GPUs);
@@ -153,6 +169,8 @@ public class MetricController {
     public ResponseEntity<List<NetInterfaceResponseDTO>> getNetInterfaces(@RequestBody(required = false) BaseAndMetricSearchRequestDTO requestDTO) {
         BaseSearchCriteria baseSearchCriteria = extractCriteria.extractBaseSearchCriteria(requestDTO);
         MetricTimeSearchCriteria metricTimeSearchCriteria = extractCriteria.extractMetricTimeSearchCriteria(requestDTO);
+        metricAccessService.assertCanReadServer(metricTimeSearchCriteria.getServerID());
+        metricAccessService.assertCanReadMetric(metricTimeSearchCriteria.getMetricId());
 
         List<NetInterfaceResponseDTO> netInterface = netInterfaceService.getNetInterfacesByCriteria(baseSearchCriteria, metricTimeSearchCriteria);
 

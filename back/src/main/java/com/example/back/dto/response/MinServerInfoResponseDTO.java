@@ -3,6 +3,8 @@ package com.example.back.dto.response;
 import com.example.back.model.Server;
 import lombok.*;
 
+import java.time.Instant;
+
 @Setter
 @Getter
 @NoArgsConstructor
@@ -15,6 +17,8 @@ public class MinServerInfoResponseDTO {
     private String serverName;
     private String addInfo;
     private Long idserver;
+    private Boolean online;
+    private Instant lastSeenAt;
 
     public static MinServerInfoResponseDTO toDTO(Server server){
         return MinServerInfoResponseDTO.builder()
@@ -23,6 +27,8 @@ public class MinServerInfoResponseDTO {
                 .address(server.getAddress())
                 .serverName(server.getServerName())
                 .addInfo(server.getAddInfo())
+                .online(server.getOnline())
+                .lastSeenAt(server.getLastSeenAt())
                 .build();
     }
 }

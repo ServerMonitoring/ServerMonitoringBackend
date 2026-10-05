@@ -6,10 +6,11 @@ import com.example.back.dto.response.FullServerInfoResponseDTO;
 import com.example.back.dto.response.MinServerInfoResponseDTO;
 import com.example.back.dto.response.StaticMetricServerResponseDTO;
 import com.example.back.dto.search.ServerSearchCriteria;
-import com.example.back.exception.RequestArgumentException;
+import com.example.back.exception.ResourceAccessDeniedException;
 import com.example.back.exception.UserNotFoundException;
 import com.example.back.model.Server;
 import com.example.back.model.Users;
+import com.example.back.model.enums.Role;
 import com.example.back.repository.ServerRepository;
 import com.example.back.repository.UserRepository;
 import com.example.back.service.ServerService;
@@ -45,6 +46,7 @@ public class ServerServiceImpl implements ServerService {
         Optional.ofNullable(requestDTO.getServerName()).ifPresent(server::setServerName);
         Optional.ofNullable(requestDTO.getAddress()).ifPresent(server::setAddress);
         Optional.ofNullable(requestDTO.getAddInfo()).ifPresent(server::setAddInfo);
+        server.setOnline(false);
 
         Server savedServer = serverRepository.save(server);
 
@@ -53,22 +55,21 @@ public class ServerServiceImpl implements ServerService {
 
     @Override
     public String updateNodeToken(Long serverId, String token){
-        Long id = jwtService.extractId(token);
-        Users user = userRepository.findById(id).orElseThrow(()-> new UserNotFoundException("User not found"));
+        Users user = getUser(token);
         Server server = serverRepository.findById(serverId).orElseThrow(()-> new UserNotFoundException("Server not found"));
 
-        if (!user.getUserId().equals(server.getUsers().getUserId())) {
-            throw new UserNotFoundException("Server does not belong to user");
+        if (!isAdmin(user) && !user.getUserId().equals(server.getUsers().getUserId())) {
+            throw new ResourceAccessDeniedException("You do not have access to this server");
         }
 
-        return jwtService.generateNodeToken(server.getServerId(),id);
+        // The node token must identify the owner of the server even when an admin refreshes it.
+        return jwtService.generateNodeToken(server.getServerId(), server.getUsers().getUserId());
     }
 
     @Override
     public List<MinServerInfoResponseDTO> getMinServerInfo (ServerSearchCriteria criteria, String token){
-        Long id = jwtService.extractId(token);
-        Users user = userRepository.findById(id).orElseThrow(()-> new UserNotFoundException("User not found"));
-        criteria.setUserId(user.getUserId());
+        Users user = getUser(token);
+        restrictToUserServers(criteria, user);
         Specification<Server> serverSpecification = ServerSpecification.byCriteria(criteria);
 
         List<Server> servers = serverRepository.findAll(serverSpecification);
@@ -77,9 +78,8 @@ public class ServerServiceImpl implements ServerService {
 
     @Override
     public List<FullServerInfoResponseDTO> getFullServerInfo (ServerSearchCriteria criteria, String token){
-        Long id = jwtService.extractId(token);
-        Users user = userRepository.findById(id).orElseThrow(()-> new UserNotFoundException("User not found"));
-        criteria.setUserId(user.getUserId());
+        Users user = getUser(token);
+        restrictToUserServers(criteria, user);
         Specification<Server> serverSpecification = ServerSpecification.byCriteria(criteria);
 
         List<Server> servers = serverRepository.findAll(serverSpecification);
@@ -88,9 +88,8 @@ public class ServerServiceImpl implements ServerService {
 
     @Override
     public List<StaticMetricServerResponseDTO> getStaticMetricServer (ServerSearchCriteria criteria, String token){
-        Long id = jwtService.extractId(token);
-        Users user = userRepository.findById(id).orElseThrow(()-> new UserNotFoundException("User not found"));
-        criteria.setUserId(user.getUserId());
+        Users user = getUser(token);
+        restrictToUserServers(criteria, user);
         Specification<Server> serverSpecification = ServerSpecification.byCriteria(criteria);
 
         List<Server> servers = serverRepository.findAll(serverSpecification);
@@ -99,12 +98,11 @@ public class ServerServiceImpl implements ServerService {
 
     @Override
     public MinServerInfoResponseDTO updateServer(ServerUpdateRequestDTO requestDTO, String token){
-        Long id = jwtService.extractId(token);
-        Users user = userRepository.findById(id).orElseThrow(()-> new UserNotFoundException("User not found"));
+        Users user = getUser(token);
         Server server = serverRepository.findById(requestDTO.getId()).orElseThrow(()-> new UserNotFoundException("Server not found"));
 
-        if (!user.getUserId().equals(server.getUsers().getUserId())) {
-            throw new RequestArgumentException("User does not belong to user");
+        if (!isAdmin(user) && !user.getUserId().equals(server.getUsers().getUserId())) {
+            throw new ResourceAccessDeniedException("You do not have access to this server");
         }
 
         Optional.ofNullable(requestDTO.getServerName()).ifPresent(server::setServerName);
@@ -116,14 +114,28 @@ public class ServerServiceImpl implements ServerService {
 
     @Override
     public void deleteServer(Long serverId, String token){
-        Long id = jwtService.extractId(token);
-        Users user = userRepository.findById(id).orElseThrow(()-> new UserNotFoundException("User not found"));
+        Users user = getUser(token);
         Server server = serverRepository.findById(serverId).orElseThrow(()-> new UserNotFoundException("Server not found"));
 
-        if (!user.getUserId().equals(server.getUsers().getUserId())) {
-            throw new RequestArgumentException("User does not belong to user");
+        if (!isAdmin(user) && !user.getUserId().equals(server.getUsers().getUserId())) {
+            throw new ResourceAccessDeniedException("You do not have access to this server");
         }
 
         serverRepository.delete(server);
+    }
+
+    private Users getUser(String token) {
+        Long id = jwtService.extractId(token);
+        return userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User not found"));
+    }
+
+    private boolean isAdmin(Users user) {
+        return user.getRole() == Role.ADMIN;
+    }
+
+    private void restrictToUserServers(ServerSearchCriteria criteria, Users user) {
+        if (!isAdmin(user)) {
+            criteria.setUserId(user.getUserId());
+        }
     }
 }

@@ -17,6 +17,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.util.List;
 
 @Service
@@ -52,19 +53,17 @@ public class MetricServiceImpl implements MetricService {
         Server server = serverRepository.findById(serverId)
                 .orElseThrow(() -> new RuntimeException("Server not found"));
 
-        boolean changed = false;
+        EntityUtils.updateIfChanged(server::getHostname, server::setHostname, dtoRequest.getHostname());
+        EntityUtils.updateIfChanged(server::getOsInfo, server::setOsInfo, dtoRequest.getOs());
+        EntityUtils.updateIfChanged(server::getCpuModel, server::setCpuModel, dtoRequest.getCpuModel());
+        EntityUtils.updateIfChanged(server::getCpuCountCores, server::setCpuCountCores, dtoRequest.getCpuCountCores());
+        EntityUtils.updateIfChanged(server::getCpuCountCoresPhysical, server::setCpuCountCoresPhysical, dtoRequest.getCpuCountCoresPhysical());
+        EntityUtils.updateIfChanged(server::getMinFreq, server::setMinFreq, dtoRequest.getMinFreq());
+        EntityUtils.updateIfChanged(server::getMaxFreq, server::setMaxFreq, dtoRequest.getMaxFreq());
 
-        changed |= EntityUtils.updateIfChanged(server::getHostname, server::setHostname, dtoRequest.getHostname());
-        changed |= EntityUtils.updateIfChanged(server::getOsInfo, server::setOsInfo, dtoRequest.getOs());
-        changed |= EntityUtils.updateIfChanged(server::getCpuModel, server::setCpuModel, dtoRequest.getCpuModel());
-        changed |= EntityUtils.updateIfChanged(server::getCpuCountCores, server::setCpuCountCores, dtoRequest.getCpuCountCores());
-        changed |= EntityUtils.updateIfChanged(server::getCpuCountCoresPhysical, server::setCpuCountCoresPhysical, dtoRequest.getCpuCountCoresPhysical());
-        changed |= EntityUtils.updateIfChanged(server::getMinFreq, server::setMinFreq, dtoRequest.getMinFreq());
-        changed |= EntityUtils.updateIfChanged(server::getMaxFreq, server::setMaxFreq, dtoRequest.getMaxFreq());
-
-        if (changed){
-            serverRepository.save(server);
-        }
+        server.setLastSeenAt(Instant.now());
+        server.setOnline(true);
+        serverRepository.save(server);
     }
 
     @Override
@@ -160,6 +159,10 @@ public class MetricServiceImpl implements MetricService {
         // Сохраняем только родителя — каскад сохранит дочерние
         metricRepository.save(metric);
         alertEvaluationService.evaluateAndSaveAlerts(server,metricDTORequest,server.getUsers().getPreferredLanguage());
+
+        server.setLastSeenAt(Instant.now());
+        server.setOnline(true);
+        serverRepository.save(server);
     }
 
 
